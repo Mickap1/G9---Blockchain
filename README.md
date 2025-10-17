@@ -1,422 +1,795 @@
-# 🏗️ Tokenized Asset Management Platform
+# 🏗️ Plateforme de Tokenisation d'Actifs Réels (RWA)# 🏗️ Plateforme de Tokenisation d'Actifs Réels (RWA)
 
-> A blockchain-based platform for tokenizing real-world assets (RWAs) with on-chain KYC compliance and secure trading capabilities.
 
-**Epitech Project 2025-2026** | Final Year Blockchain Project
 
----
+> Système blockchain complet pour la tokenisation d'actifs réels avec conformité KYC, DEX intégré et Oracle de prix automatisé.> Système blockchain complet pour la tokenisation d'actifs réels avec conformité KYC, DEX intégré et Oracle de prix automatisé.
 
-# 🏗️ Tokenized Asset Management Platform
 
-> A complete blockchain-based platform for tokenizing real-world assets (RWAs) with on-chain KYC compliance, supporting both fungible (ERC-20) and non-fungible (ERC-721) tokenization.
 
-**Epitech Project 2025-2026** | Final Year Blockchain Project
+**Projet Blockchain Epitech 2025-2026****Projet Blockchain Epitech 2025-2026**
 
-[![Tests](https://img.shields.io/badge/tests-129%20passing-success)](./test)
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue)](https://soliditylang.org/)
-[![Hardhat](https://img.shields.io/badge/Hardhat-2.22.0-yellow)](https://hardhat.org/)
-[![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.0.0-purple)](https://www.openzeppelin.com/)
 
----
 
-## 📚 Documentation Complète
+[![Tests](https://img.shields.io/badge/tests-168%20passing-success)](./test)[![Tests](https://img.shields.io/badge/tests-168%20passing-success)](./test)
 
-📖 **[Accéder à la documentation complète →](./docs/README.md)**
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue)](https://soliditylang.org/)[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue)](https://soliditylang.org/)
 
-### Guides Rapides
-- 🚀 [Guide de Déploiement](./docs/deployment-guide.md) - Déployer sur Sepolia/Amoy
-- 📖 [Guide d'Utilisation](./docs/usage-guide.md) - Interagir avec les contrats
-- 🔍 [Vérification Automatique](./docs/auto-verification.md) - Vérifier sur Etherscan
-- ❓ [FAQ](./docs/faq.md) - Questions fréquentes
+[![Hardhat](https://img.shields.io/badge/Hardhat-2.22.0-yellow)](https://hardhat.org/)[![Hardhat](https://img.shields.io/badge/Hardhat-2.22.0-yellow)](https://hardhat.org/)
 
-### API des Contrats
--  [KYCRegistry](./docs/KYCRegistry.md) - Système de vérification KYC complet
-- 🪙 [FungibleAssetToken](./docs/FungibleAssetToken.md) - Token ERC-20 pour actifs fractionnés
-- 💎 NFTAssetToken - Token ERC-721 pour actifs uniques (documentation en cours)
+[![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.0.0-purple)](https://www.openzeppelin.com/)[![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.0.0-purple)](https://www.openzeppelin.com/)
 
----
 
-## 📋 Project Overview
 
-This platform enables the **tokenization of real-world assets** such as:
-- 🏢 **Real Estate** (fractional ownership via ERC-20)
-- 💎 **Precious Stones** (unique diamonds via ERC-721)
-- 🎨 **Artwork** (individual pieces via ERC-721)
-- 📊 **Company Shares** (fungible tokens via ERC-20)
+------
 
-### ✅ Completed Features (Phase 1, 2 & 3) - 60% Complete 🎯
 
-#### 🪙 **Tokenization** (100% Complete)
+
+## 🎯 Vue d'Ensemble## 🎯 Vue d'Ensemble
+
+
+
+Cette plateforme permet de **tokeniser des actifs réels** (immobilier, diamants, œuvres d'art) sur la blockchain avec:Cette plateforme permet de **tokeniser des actifs réels** (immobilier, diamants, œuvres d'art) sur la blockchain avec:
+
+
+
+- 🪙 **Tokens Fongibles (ERC-20)** - Propriété fractionnée d'actifs- 🪙 **Tokens Fongibles (ERC-20)** - Propriété fractionnée d'actifs
+
+- 💎 **Tokens NFT (ERC-721)** - Actifs uniques (diamants GIA)- 💎 **Tokens NFT (ERC-721)** - Actifs uniques (diamants GIA)
+
+- 🔐 **Système KYC On-Chain** - Conformité réglementaire- � **Système KYC On-Chain** - Conformité réglementaire
+
+- 💱 **DEX Intégré** - Trading décentralisé avec pool de liquidité- 💱 **DEX Intégré** - Trading décentralisé avec pool de liquidité
+
+- 📊 **Oracle de Prix** - Mise à jour automatique des valuations NFT- 📊 **Oracle de Prix** - Mise à jour automatique des valuations NFT
+
+
+
+---### ✅ Completed Features (Phase 1, 2 & 3) - 60% Complete 🎯
+
+
+
+## ✅ Fonctionnalités Implémentées#### 🪙 **Tokenization** (100% Complete)
+
 - ✅ **Fungible Assets (ERC-20)**: FungibleAssetToken with supply management, pricing, and metadata
-- ✅ **Non-Fungible Assets (ERC-721)**: NFTAssetToken with individual asset tracking and valuation
-- ✅ **Batch Operations**: Efficient batch minting for both token types
-- ✅ **Asset Metadata**: Complete on-chain data (name, valuation, certificates, dates)
 
-#### 🔐 **On-Chain KYC & Compliance** (100% Complete)
+### 🪙 Tokenisation (100%)- ✅ **Non-Fungible Assets (ERC-721)**: NFTAssetToken with individual asset tracking and valuation
+
+- ✅ **FungibleAssetToken** - ERC-20 avec supply cap et métadonnées- ✅ **Batch Operations**: Efficient batch minting for both token types
+
+- ✅ **NFTAssetToken** - ERC-721 pour diamants certifiés GIA- ✅ **Asset Metadata**: Complete on-chain data (name, valuation, certificates, dates)
+
+- ✅ Batch minting pour les deux types
+
+- ✅ Burn, pause, et gestion des rôles#### 🔐 **On-Chain KYC & Compliance** (100% Complete)
+
 - ✅ **KYC System**: Submission, approval, rejection, and expiration management
-- ✅ **Whitelist**: Only approved addresses can hold/trade tokens
-- ✅ **Blacklist**: Revoke access even with approved KYC (security priority)
-- ✅ **Transfer Enforcement**: KYC checks enforced in `_update()` hook
-- ✅ **Role-Based Access**: Separate roles for KYC admin, minter, pauser
+
+### 🔐 Conformité KYC (100%)- ✅ **Whitelist**: Only approved addresses can hold/trade tokens
+
+- ✅ **KYCRegistry** - Système d'approbation/révocation- ✅ **Blacklist**: Revoke access even with approved KYC (security priority)
+
+- ✅ Whitelist avec expiration- ✅ **Transfer Enforcement**: KYC checks enforced in `_update()` hook
+
+- ✅ Blacklist prioritaire (sécurité)- ✅ **Role-Based Access**: Separate roles for KYC admin, minter, pauser
+
+- ✅ Transferts bloqués sans KYC
 
 #### 🛡️ **Security & Safety**
-- ✅ **Pausable Transfers**: Emergency pause for both token types
-- ✅ **Access Control**: OpenZeppelin's battle-tested AccessControl
-- ✅ **Blacklist Priority**: Blacklist checked before whitelist (security first)
-- ✅ **Custom Errors**: Gas-efficient error handling
-- ✅ **Event Emissions**: Complete audit trail for all operations
+
+### 💱 Trading DEX (100%)- ✅ **Pausable Transfers**: Emergency pause for both token types
+
+- ✅ **SimpleDEX** - AMM avec formule x*y=k- ✅ **Access Control**: OpenZeppelin's battle-tested AccessControl
+
+- ✅ Pool de liquidité Token/ETH- ✅ **Blacklist Priority**: Blacklist checked before whitelist (security first)
+
+- ✅ Swap avec protection slippage- ✅ **Custom Errors**: Gas-efficient error handling
+
+- ✅ Fees 0.3% redistribués aux LP- ✅ **Event Emissions**: Complete audit trail for all operations
+
+- ✅ KYC obligatoire pour trader
 
 #### 🧪 **Testing & Quality** (168 Tests Passing)
-- ✅ **KYCRegistry**: 87 comprehensive tests
-- ✅ **FungibleAssetToken**: 36 tests covering all scenarios
-- ✅ **NFTAssetToken**: 106 tests including edge cases and integration
-- ✅ **SimpleDEX**: 39 tests for trading and liquidity
-- ✅ **100% Core Functionality Coverage**
+
+### 📊 Oracle de Prix (100%)- ✅ **KYCRegistry**: 87 comprehensive tests
+
+- ✅ **SimplePriceOracle** - Prix on-chain pour NFTs- ✅ **FungibleAssetToken**: 36 tests covering all scenarios
+
+- ✅ Historique des prix (max 100 entrées)- ✅ **NFTAssetToken**: 106 tests including edge cases and integration
+
+- ✅ Mise à jour automatique (script en boucle)- ✅ **SimpleDEX**: 39 tests for trading and liquidity
+
+- ✅ Variation aléatoire ±20% pour simulation- ✅ **100% Core Functionality Coverage**
+
+- ✅ Rôles d'administration sécurisés
 
 #### � **On-Chain DEX Trading** (100% Complete) ✨ NEW
-- ✅ **SimpleDEX Contract**: Custom AMM with KYC enforcement
-- ✅ **Constant Product Formula**: x * y = k (Uniswap v2 style)
-- ✅ **Liquidity Pools**: Token/ETH pools with LP tokens
-- ✅ **Trading Fees**: 0.3% fee distributed to liquidity providers
-- ✅ **KYC-Compliant**: Only whitelisted users can trade/provide liquidity
-- ✅ **Slippage Protection**: Min output parameters on all swaps
+
+### 🧪 Tests (168 tests)- ✅ **SimpleDEX Contract**: Custom AMM with KYC enforcement
+
+- ✅ KYCRegistry - 87 tests- ✅ **Constant Product Formula**: x * y = k (Uniswap v2 style)
+
+- ✅ FungibleAssetToken - 36 tests- ✅ **Liquidity Pools**: Token/ETH pools with LP tokens
+
+- ✅ NFTAssetToken - 106 tests- ✅ **Trading Fees**: 0.3% fee distributed to liquidity providers
+
+- ✅ SimpleDEX - 39 tests- ✅ **KYC-Compliant**: Only whitelisted users can trade/provide liquidity
+
+- ✅ 100% coverage des fonctions critiques- ✅ **Slippage Protection**: Min output parameters on all swaps
+
 - ✅ **Security**: ReentrancyGuard, Pausable, role-based access
+
+---
 
 ### 🚧 Remaining Work (Phase 4-5)
 
-#### 🔄 **Real-Time Indexer** (Not Started)
-- ⏳ Event Listener Backend
-- ⏳ Database Synchronization
-- ⏳ API for Frontend
+## 🚀 Démarrage Rapide
 
-#### 🌐 **Price Oracle** (Not Started)
-- ⏳ Asset Price Feeds
+#### 🔄 **Real-Time Indexer** (Not Started)
+
+### 1. Installation- ⏳ Event Listener Backend
+
+- ⏳ Database Synchronization
+
+```bash- ⏳ API for Frontend
+
+# Cloner le repo
+
+git clone <votre-repo>#### 🌐 **Price Oracle** (Not Started)
+
+cd G9---Blockchain- ⏳ Asset Price Feeds
+
 - ⏳ On-Chain Price Updates
----
+
+# Installer les dépendances---
+
+npm install
 
 ## 📋 Project Overview
 
-This platform enables the tokenization of real-world assets such as real estate, artwork, and precious commodities. It implements:
+# Configurer l'environnement
 
-- ✅ **Tokenization** of fungible (ERC-20) assets with KYC compliance
+cp .env.example .envThis platform enables the tokenization of real-world assets such as real estate, artwork, and precious commodities. It implements:
+
+# Éditer .env avec vos clés
+
+```- ✅ **Tokenization** of fungible (ERC-20) assets with KYC compliance
+
 - ✅ **On-chain KYC & Compliance** with whitelisting/blacklisting mechanisms
-- ✅ **Role-based Access Control** for secure operations
+
+### 2. Compilation et Tests- ✅ **Role-based Access Control** for secure operations
+
 - ✅ **Pausable Transfers** for emergency situations
-- ✅ **Comprehensive Testing** with 87 unit tests
 
----
+```bash- ✅ **Comprehensive Testing** with 87 unit tests
 
-## 🛠️ Technology Stack
+# Compiler les contrats
+
+npx hardhat compile---
+
+
+
+# Lancer tous les tests## 🛠️ Technology Stack
+
+npx hardhat test
 
 ### Blockchain & Smart Contracts
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
+# Tests avec coverage
+
+npm run test:coverage| Technology | Version | Purpose |
+
+```|------------|---------|---------|
+
 | **Solidity** | ^0.8.20 | Smart contract programming language |
-| **Hardhat** | ^2.22.0 | Ethereum development environment |
+
+### 3. Déploiement sur Sepolia| **Hardhat** | ^2.22.0 | Ethereum development environment |
+
 | **OpenZeppelin** | ^5.0.0 | Secure, audited smart contract libraries |
-| **Ethers.js** | ^6.4.0 | Ethereum library for JavaScript/TypeScript |
 
-### Development Tools
+```bash| **Ethers.js** | ^6.4.0 | Ethereum library for JavaScript/TypeScript |
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
+# Déployer tous les contrats de base
+
+npx hardhat run scripts/deploy-all.ts --network sepolia### Development Tools
+
+
+
+# Déployer le DEX| Technology | Version | Purpose |
+
+npx hardhat run scripts/deploy-dex.ts --network sepolia|------------|---------|---------|
+
 | **TypeScript** | ~5.0.0 | Type-safe development |
-| **Chai** | ^4.2.0 | Testing framework |
-| **Hardhat Toolbox** | ^5.0.0 | All-in-one plugin for Hardhat |
+
+# Déployer l'Oracle| **Chai** | ^4.2.0 | Testing framework |
+
+npx hardhat run scripts/deploy-oracle.ts --network sepolia| **Hardhat Toolbox** | ^5.0.0 | All-in-one plugin for Hardhat |
+
 | **Solidity Coverage** | ^0.8.0 | Code coverage for smart contracts |
-| **Hardhat Gas Reporter** | ^1.0.8 | Gas usage analysis |
 
-### Blockchain Networks
+# Minter un Diamond NFT| **Hardhat Gas Reporter** | ^1.0.8 | Gas usage analysis |
 
-| Network | Chain ID | Purpose | Status |
+npx hardhat run scripts/mint-diamond.ts --network sepolia
+
+```### Blockchain Networks
+
+
+
+### 4. Lancer l'Oracle (Auto-Update)| Network | Chain ID | Purpose | Status |
+
 |---------|----------|---------|--------|
-| **Ethereum Sepolia** | 11155111 | Primary testnet deployment | ✅ Active |
-| **Polygon Amoy** | 80002 | Alternative testnet | ✅ Active |
-| **Hardhat Network** | 31337 | Local development & testing | ✅ Active |
+
+```bash| **Ethereum Sepolia** | 11155111 | Primary testnet deployment | ✅ Active |
+
+# Mode test (updates toutes les 2 minutes)| **Polygon Amoy** | 80002 | Alternative testnet | ✅ Active |
+
+npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia| **Hardhat Network** | 31337 | Local development & testing | ✅ Active |
+
 | ~~**Polygon Mumbai**~~ | ~~80001~~ | ~~Deprecated~~ | ❌ Sunset |
 
-> **Note**: Mumbai testnet was deprecated in April 2024. All deployments migrated to Amoy.
+# Pour production: éditer le fichier et changer UPDATE_INTERVAL à 1 heure
 
----
+```> **Note**: Mumbai testnet was deprecated in April 2024. All deployments migrated to Amoy.
 
-## 📦 Project Structure
 
-```
-G-ING-910-PAR-9-1-blockchain-14/
+
+------
+
+
+
+## 📦 Structure du Projet## 📦 Project Structure
+
+
+
+``````
+
+G9---Blockchain/G-ING-910-PAR-9-1-blockchain-14/
+
+├── contracts/                          # Smart contracts Solidity│
+
+│   ├── KYCregistry.sol                # Système KYC├── contracts/                      # ✅ Solidity smart contracts
+
+│   ├── FungibleAssetToken.sol         # Token ERC-20│   ├── KYCregistry.sol            # ✅ KYC & compliance management
+
+│   ├── NFTAssetToken.sol              # Token ERC-721 (Diamonds)│   ├── FungibleAssetToken.sol     # ✅ ERC-20 for fractional assets
+
+│   ├── SimpleDEX.sol                  # DEX avec AMM│   └── NFTAssetToken.sol          # ✅ ERC-721 for unique assets
+
+│   └── SimplePriceOracle.sol          # Oracle de prix│
+
+│├── test/                           # ✅ Test files (TypeScript)
+
+├── scripts/                            # Scripts de déploiement et utilitaires│   ├── KYCRegistry.test.ts        # ✅ 87 tests passing
+
+│   ├── deploy-*.ts                    # Scripts de déploiement│   ├── FungibleAssetToken.test.ts # ✅ 36 tests passing
+
+│   ├── mint-diamond.ts                # Minter un NFT Diamond│   └── NFTAssetToken.test.ts      # ✅ 106 tests passing
+
+│   ├── auto-update-diamond-price.ts   # Auto-update prix (loop)│
+
+│   ├── check-prices.ts                # Consulter les prix├── scripts/                        # ✅ Deployment & utility scripts
+
+│   ├── trade-tokens.ts                # Trading multi-wallet│   ├── deploy-kyc.ts              # ✅ Deploy KYCRegistry individually
+
+│   └── README.md                      # Documentation des scripts│   ├── deploy-fungible.ts         # ✅ Deploy FungibleAssetToken individually
+
+││   ├── deploy-nft.ts              # ✅ Deploy NFTAssetToken individually
+
+├── test/                               # Tests unitaires (168 tests)│   ├── deploy-all.ts              # ✅ Deploy all contracts at once
+
+│   ├── KYCRegistry.test.ts│   ├── deploy-testnet.ts          # ✅ Legacy deployment script
+
+│   ├── FungibleAssetToken.test.ts│   ├── deploy-nft-demo.ts         # ✅ Deploy NFT demo with sample assets
+
+│   ├── NFTAssetToken.test.ts│   └── README.md                  # ✅ Deployment scripts documentation
+
+│   └── SimpleDEX.test.ts│
+
+│├── deployments/                    # ✅ Deployed contract addresses
+
+├── docs/                               # Documentation│   ├── sepolia-addresses.json     # ✅ Sepolia testnet deployments
+
+│   ├── deployment-guide.md            # Guide de déploiement complet│   └── sepolia-nft-demo.json      # ✅ NFT demo deployment info
+
+│   ├── DEX-DEPLOYMENT-GUIDE.md        # Guide DEX│
+
+│   ├── SimpleDEX.md                   # API du DEX├── docs/                           # ✅ Complete documentation
+
+│   ├── ORACLE-GUIDE.md                # Guide Oracle│   ├── README.md                  # ✅ Documentation hub
+
+│   ├── KYCRegistry.md                 # API KYC│   ├── quick-deployment.md        # ✅ Quick start deployment guide
+
+│   └── FungibleAssetToken.md          # API Token Fongible│   ├── deployment-guide.md        # ✅ Detailed deployment guide
+
+││   ├── usage-guide.md             # ✅ How to use contracts
+
+├── deployments/                        # Adresses des contrats déployés│   ├── auto-verification.md       # ✅ Contract verification guide
+
+│   └── sepolia-addresses.json│   ├── faq.md                     # ✅ FAQ
+
+││   ├── KYCRegistry.md             # ✅ KYC API docs
+
+└── hardhat.config.ts                   # Configuration Hardhat│   ├── FungibleAssetToken.md      # ✅ Fungible token API docs
+
+```│   └── STRUCTURE.md               # ✅ Project structure
+
 │
-├── contracts/                      # ✅ Solidity smart contracts
-│   ├── KYCregistry.sol            # ✅ KYC & compliance management
-│   ├── FungibleAssetToken.sol     # ✅ ERC-20 for fractional assets
-│   └── NFTAssetToken.sol          # ✅ ERC-721 for unique assets
-│
-├── test/                           # ✅ Test files (TypeScript)
-│   ├── KYCRegistry.test.ts        # ✅ 87 tests passing
-│   ├── FungibleAssetToken.test.ts # ✅ 36 tests passing
-│   └── NFTAssetToken.test.ts      # ✅ 106 tests passing
-│
-├── scripts/                        # ✅ Deployment & utility scripts
-│   ├── deploy-kyc.ts              # ✅ Deploy KYCRegistry individually
-│   ├── deploy-fungible.ts         # ✅ Deploy FungibleAssetToken individually
-│   ├── deploy-nft.ts              # ✅ Deploy NFTAssetToken individually
-│   ├── deploy-all.ts              # ✅ Deploy all contracts at once
-│   ├── deploy-testnet.ts          # ✅ Legacy deployment script
-│   ├── deploy-nft-demo.ts         # ✅ Deploy NFT demo with sample assets
-│   └── README.md                  # ✅ Deployment scripts documentation
-│
-├── deployments/                    # ✅ Deployed contract addresses
-│   ├── sepolia-addresses.json     # ✅ Sepolia testnet deployments
-│   └── sepolia-nft-demo.json      # ✅ NFT demo deployment info
-│
-├── docs/                           # ✅ Complete documentation
-│   ├── README.md                  # ✅ Documentation hub
-│   ├── quick-deployment.md        # ✅ Quick start deployment guide
-│   ├── deployment-guide.md        # ✅ Detailed deployment guide
-│   ├── usage-guide.md             # ✅ How to use contracts
-│   ├── auto-verification.md       # ✅ Contract verification guide
-│   ├── faq.md                     # ✅ FAQ
-│   ├── KYCRegistry.md             # ✅ KYC API docs
-│   ├── FungibleAssetToken.md      # ✅ Fungible token API docs
-│   └── STRUCTURE.md               # ✅ Project structure
-│
-├── artifacts/                      # 🔧 Compiled contracts (generated)
+
+---├── artifacts/                      # 🔧 Compiled contracts (generated)
+
 ├── cache/                          # 🔧 Hardhat cache (generated)
-├── typechain-types/                # 🔧 TypeScript types (generated)
+
+## 📝 Contrats Déployés sur Sepolia├── typechain-types/                # 🔧 TypeScript types (generated)
+
 │
-├── hardhat.config.ts               # ✅ Hardhat configuration
-├── tsconfig.json                   # ✅ TypeScript configuration
-├── package.json                    # ✅ Dependencies & scripts
-├── .env.example                    # ✅ Environment variables template
-└── README.md                       # ✅ This file
-```
+
+| Contrat | Adresse | Etherscan |├── hardhat.config.ts               # ✅ Hardhat configuration
+
+|---------|---------|-----------|├── tsconfig.json                   # ✅ TypeScript configuration
+
+| **KYCRegistry** | `0x45d12B1D574608a98C7b6E7023330AF260b0B5b8` | [View](https://sepolia.etherscan.io/address/0x45d12B1D574608a98C7b6E7023330AF260b0B5b8) |├── package.json                    # ✅ Dependencies & scripts
+
+| **FungibleAssetToken** | `0x6B2a38Ef30420B0AF041F014a092BEDB39F2Eb81` | [View](https://sepolia.etherscan.io/address/0x6B2a38Ef30420B0AF041F014a092BEDB39F2Eb81) |├── .env.example                    # ✅ Environment variables template
+
+| **NFTAssetToken** | `0xcC1fA977E3c47D3758117De61218208c1282362c` | [View](https://sepolia.etherscan.io/address/0xcC1fA977E3c47D3758117De61218208c1282362c) |└── README.md                       # ✅ This file
+
+| **SimpleDEX** | `0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4` | [View](https://sepolia.etherscan.io/address/0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4) |```
+
+| **SimplePriceOracle** | `0x602571F05745181fF237b81dAb8F67148e9475C7` | [View](https://sepolia.etherscan.io/address/0x602571F05745181fF237b81dAb8F67148e9475C7) |
 
 ---
+
+**Tous les contrats sont vérifiés et accessibles sur Etherscan** ✅
 
 ## ⚡ Quick Start
 
+---
+
 Deploy all contracts to Sepolia testnet in 3 steps:
 
+## 🛠️ Stack Technique
+
 ```bash
-# 1. Install dependencies
-npm install
 
-# 2. Configure environment (add your keys to .env)
-cp .env.example .env
+| Technologie | Version | Usage |# 1. Install dependencies
 
-# 3. Deploy everything
-npm run deploy:all:sepolia
+|------------|---------|-------|npm install
+
+| **Solidity** | 0.8.20 | Smart contracts |
+
+| **Hardhat** | 2.22.0 | Environnement de développement |# 2. Configure environment (add your keys to .env)
+
+| **OpenZeppelin** | 5.0.0 | Librairies sécurisées auditées |cp .env.example .env
+
+| **Ethers.js** | 6.4.0 | Interaction blockchain |
+
+| **TypeScript** | 5.0.0 | Scripts et tests |# 3. Deploy everything
+
+| **Chai** | 4.2.0 | Framework de tests |npm run deploy:all:sepolia
+
 ```
+
+**Réseau:** Ethereum Sepolia Testnet (Chain ID: 11155111)
 
 **That's it!** Your contracts are now deployed and verified. See [`docs/quick-deployment.md`](docs/quick-deployment.md) for details.
 
 ---
 
+---
+
+## 💡 Commandes Utiles
+
 ## 🚀 Getting Started
 
-### Prerequisites
+### Déploiement
 
-Before you begin, ensure you have the following installed:
+```bash### Prerequisites
 
-- **Node.js** >= 18.0.0 ([Download](https://nodejs.org/))
-- **npm** >= 9.0.0 (comes with Node.js)
-- **Git** ([Download](https://git-scm.com/))
-- **MetaMask** or another Web3 wallet ([Install](https://metamask.io/))
+# Tout déployer en une commande
 
-### Installation
+npx hardhat run scripts/deploy-all.ts --network sepoliaBefore you begin, ensure you have the following installed:
+
+
+
+# Déploiement individuel- **Node.js** >= 18.0.0 ([Download](https://nodejs.org/))
+
+npx hardhat run scripts/deploy-kyc.ts --network sepolia- **npm** >= 9.0.0 (comes with Node.js)
+
+npx hardhat run scripts/deploy-fungible.ts --network sepolia- **Git** ([Download](https://git-scm.com/))
+
+npx hardhat run scripts/deploy-nft.ts --network sepolia- **MetaMask** or another Web3 wallet ([Install](https://metamask.io/))
+
+npx hardhat run scripts/deploy-dex.ts --network sepolia
+
+npx hardhat run scripts/deploy-oracle.ts --network sepolia### Installation
+
+```
 
 1. **Clone the repository**
 
-```bash
-git clone https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14.git
-cd G-ING-910-PAR-9-1-blockchain-14
+### Configuration & Monitoring
+
+```bash```bash
+
+# Whitelist une adressegit clone https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14.git
+
+npx hardhat run scripts/whitelist-account.ts --network sepoliacd G-ING-910-PAR-9-1-blockchain-14
+
 ```
 
-2. **Install dependencies**
+# Vérifier le statut des comptes
 
-```bash
-npm install
+npx hardhat run scripts/check-accounts-status.ts --network sepolia2. **Install dependencies**
+
+
+
+# Consulter les prix dans l'Oracle```bash
+
+npx hardhat run scripts/check-prices.ts --network sepolianpm install
+
 ```
 
-3. **Configure environment variables**
+# Vérifier le solde Sepolia
 
-```bash
-# Copy the example file
-cp .env.example .env
+npx hardhat run scripts/check-sepolia-balance.ts --network sepolia3. **Configure environment variables**
 
-# Edit .env with your values
 ```
 
-Required environment variables:
+```bash
+
+### DEX Trading# Copy the example file
+
+```bashcp .env.example .env
+
+# Ajouter de la liquidité
+
+npx hardhat run scripts/setup-dex-liquidity.ts --network sepolia# Edit .env with your values
+
+```
+
+# Acheter des tokens (Account 2)
+
+npx hardhat run scripts/buy-with-account2.ts --network sepoliaRequired environment variables:
+
 ```env
-PRIVATE_KEY=your_wallet_private_key_here
-INFURA_API_KEY=your_infura_api_key_here
-ETHERSCAN_API_KEY=your_etherscan_api_key_here
-POLYGONSCAN_API_KEY=your_polygonscan_api_key_here
-```
 
-> ⚠️ **Security:** Never commit your `.env` file. Use testnet wallets only.
+# Trading complet (2 comptes)PRIVATE_KEY=your_wallet_private_key_here
+
+npx hardhat run scripts/trade-tokens.ts --network sepoliaINFURA_API_KEY=your_infura_api_key_here
+
+```ETHERSCAN_API_KEY=your_etherscan_api_key_here
+
+POLYGONSCAN_API_KEY=your_polygonscan_api_key_here
+
+### Tests```
+
+```bash
+
+# Tous les tests> ⚠️ **Security:** Never commit your `.env` file. Use testnet wallets only.
+
+npx hardhat test
 
 4. **Compile smart contracts**
 
-```bash
+# Test spécifique
+
+npx hardhat test test/SimpleDEX.test.ts```bash
+
 npm run compile
-```
 
-Expected output:
-```
-✨ Compiled X Solidity files successfully
-```
+# Avec gas reporter```
 
----
-
-## 🧪 Testing
-
-### ✅ Current Test Status: **129 Tests Passing** (4s)
-
-| Contract | Tests | Status |
-|----------|-------|--------|
-| **KYCRegistry** | 87 | ✅ All passing |
-| **FungibleAssetToken** | 36 | ✅ All passing |
-| **NFTAssetToken** | 106 | ✅ All passing |
-| **Total** | **229** | **✅ 100%** |
-
-### Run all tests
-
-```bash
-npm test
-# or
-npx hardhat test
-```
-
-Expected output:
-```
-  129 passing (4s)
-```
-
-### Run tests with coverage
-
-```bash
-npm run test:coverage
-```
-
-### Run tests with gas reporting
-
-```bash
 npm run test:gas
-```
 
-### Test a specific contract
+Expected output:
+
+# Avec coverage```
+
+npm run test:coverage✨ Compiled X Solidity files successfully
+
+``````
+
+
+
+------
+
+
+
+## 📊 Exemple d'Utilisation## 🧪 Testing
+
+
+
+### 1. Minter un Diamond NFT### ✅ Current Test Status: **129 Tests Passing** (4s)
+
+
+
+```bash| Contract | Tests | Status |
+
+npx hardhat run scripts/mint-diamond.ts --network sepolia|----------|-------|--------|
+
+```| **KYCRegistry** | 87 | ✅ All passing |
+
+| **FungibleAssetToken** | 36 | ✅ All passing |
+
+**Résultat:**| **NFTAssetToken** | 106 | ✅ All passing |
+
+- 💎 Token ID: 0| **Total** | **229** | **✅ 100%** |
+
+- 📝 Nom: "GIA Diamond 2.5ct VS1 D"
+
+- 💰 Valuation: 150,000 EUR### Run all tests
+
+- 🔗 Transaction confirmée sur Etherscan
 
 ```bash
-npx hardhat test test/KYCRegistry.test.ts           # 87 tests
-npx hardhat test test/FungibleAssetToken.test.ts    # 36 tests
-npx hardhat test test/NFTAssetToken.test.ts         # 106 tests
+
+### 2. Consulter le Prixnpm test
+
+# or
+
+```bashnpx hardhat test
+
+npx hardhat run scripts/check-prices.ts --network sepolia```
+
 ```
+
+Expected output:
+
+**Affiche:**```
+
+- Prix actuel dans l'Oracle  129 passing (4s)
+
+- Historique des variations```
+
+- Dernier update timestamp
+
+- Nombre total d'updates### Run tests with coverage
+
+
+
+### 3. Auto-Update du Prix (Simulation Marché)```bash
+
+npm run test:coverage
+
+```bash```
+
+# Lance le script en boucle infinie
+
+npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia### Run tests with gas reporting
+
+```
+
+```bash
+
+**Ce script:**npm run test:gas
+
+- ⏱️ Update toutes les 2 minutes (mode test) ou 1 heure (production)```
+
+- 🎲 Génère variation aléatoire entre -20% et +20%
+
+- 💾 Sauvegarde dans l'Oracle ET le contrat NFT### Test a specific contract
+
+- ♾️ Tourne indéfiniment jusqu'à Ctrl+C
+
+```bash
+
+---npx hardhat test test/KYCRegistry.test.ts           # 87 tests
+
+npx hardhat test test/FungibleAssetToken.test.ts    # 36 tests
+
+## 🔐 Sécuriténpx hardhat test test/NFTAssetToken.test.ts         # 106 tests
+
+```
+
+### Fonctionnalités de Sécurité
 
 ### Test Features Coverage
 
-✅ **KYCRegistry.test.ts**
-- Deployment & initialization
-- KYC submission, approval, rejection
-- Whitelist & blacklist management
-- Batch operations
+- ✅ **OpenZeppelin Audited** - Tous les contrats utilisent des librairies auditées
+
+- ✅ **Access Control** - Rôles séparés (ADMIN, MINTER, PAUSER, ORACLE_ADMIN)✅ **KYCRegistry.test.ts**
+
+- ✅ **ReentrancyGuard** - Protection contre les attaques de réentrabilité- Deployment & initialization
+
+- ✅ **Pausable** - Fonction d'urgence pour stopper les transferts- KYC submission, approval, rejection
+
+- ✅ **Blacklist Priority** - Blacklist vérifié AVANT whitelist- Whitelist & blacklist management
+
+- ✅ **Custom Errors** - Économie de gas et messages clairs- Batch operations
+
 - Role management
-- Edge cases & events
+
+### Configuration .env- Edge cases & events
+
 - Integration scenarios
 
-✅ **FungibleAssetToken.test.ts**
-- ERC-20 standard compliance
+```env
+
+# Clé privée du deployer (JAMAIS commit sur Git!)✅ **FungibleAssetToken.test.ts**
+
+PRIVATE_KEY=your_private_key_here- ERC-20 standard compliance
+
 - KYC-enforced transfers
-- Minting with supply limits
-- Batch minting
+
+# Clé privée du second compte (optionnel)- Minting with supply limits
+
+PRIVATE_KEY_2=your_second_private_key- Batch minting
+
 - Burning & pausable
-- Price per token calculations
-- Ownership percentages
 
-✅ **NFTAssetToken.test.ts**
-- ERC-721 standard compliance
-- Unique asset minting
+# RPC Provider (Alchemy recommandé)- Price per token calculations
+
+ALCHEMY_API_KEY=your_alchemy_key- Ownership percentages
+
+
+
+# Verification des contrats✅ **NFTAssetToken.test.ts**
+
+ETHERSCAN_API_KEY=your_etherscan_key- ERC-721 standard compliance
+
+```- Unique asset minting
+
 - Asset data tracking (valuation, certificates)
-- Batch minting
+
+⚠️ **IMPORTANT:** Ne JAMAIS commit le fichier `.env` (déjà dans `.gitignore`)- Batch minting
+
 - KYC-enforced transfers
-- Blacklist priority tests
+
+---- Blacklist priority tests
+
 - Admin functions (valuation updates, deactivation)
-- View functions (tokensOfOwner, collection value)
+
+## 📚 Documentation Détaillée- View functions (tokensOfOwner, collection value)
+
 - Integration scenarios
 
----
+- 📖 **[Guide de Déploiement](./docs/deployment-guide.md)** - Déploiement pas à pas
 
-## 🌐 Deployment
+- 💱 **[Guide DEX](./docs/DEX-DEPLOYMENT-GUIDE.md)** - Utilisation du DEX---
 
-### Deployment Scripts
+- 📊 **[Guide Oracle](./docs/ORACLE-GUIDE.md)** - Configuration de l'Oracle
+
+- 🔐 **[API KYCRegistry](./docs/KYCRegistry.md)** - Référence API KYC## 🌐 Deployment
+
+- 🪙 **[API FungibleToken](./docs/FungibleAssetToken.md)** - Référence API Token
+
+- 💱 **[API SimpleDEX](./docs/SimpleDEX.md)** - Référence API DEX### Deployment Scripts
+
+- 🛠️ **[Scripts README](./scripts/README.md)** - Documentation des scripts
 
 We provide **4 deployment scripts** for maximum flexibility:
 
+---
+
 #### 🔹 Individual Contract Deployment
+
+## 🎯 Roadmap
 
 Deploy contracts one by one:
 
-```bash
-# Deploy KYCRegistry
-npm run deploy:kyc:sepolia        # Ethereum Sepolia
+### ✅ Phase 1 - Tokenisation (Complète)
+
+- ✅ KYCRegistry```bash
+
+- ✅ FungibleAssetToken (ERC-20)# Deploy KYCRegistry
+
+- ✅ NFTAssetToken (ERC-721)npm run deploy:kyc:sepolia        # Ethereum Sepolia
+
 npm run deploy:kyc:amoy           # Polygon Amoy
 
-# Deploy FungibleAssetToken (requires KYC)
-npm run deploy:fungible:sepolia
-npm run deploy:fungible:amoy
+### ✅ Phase 2 - Tests & Déploiement (Complète)
 
-# Deploy NFTAssetToken (requires KYC)
-npm run deploy:nft:sepolia
-npm run deploy:nft:amoy
-```
+- ✅ 168 tests unitaires# Deploy FungibleAssetToken (requires KYC)
+
+- ✅ Déploiement Sepolianpm run deploy:fungible:sepolia
+
+- ✅ Vérification Etherscannpm run deploy:fungible:amoy
+
+
+
+### ✅ Phase 3 - Trading & Oracle (Complète)# Deploy NFTAssetToken (requires KYC)
+
+- ✅ SimpleDEX avec AMMnpm run deploy:nft:sepolia
+
+- ✅ Pool de liquiditénpm run deploy:nft:amoy
+
+- ✅ SimplePriceOracle```
+
+- ✅ Auto-update des prix
 
 #### 🚀 All-in-One Deployment
 
-Deploy all 3 contracts with a single command:
+### ⏳ Phase 4 - Indexer & API (À venir)
 
-```bash
+- ⏳ Backend d'écoute d'eventsDeploy all 3 contracts with a single command:
+
+- ⏳ Base de données (PostgreSQL)
+
+- ⏳ API REST pour frontend```bash
+
 # Deploys: KYCRegistry → FungibleAssetToken → NFTAssetToken
-npm run deploy:all:sepolia
-npm run deploy:all:amoy
-```
+
+### ⏳ Phase 5 - Frontend (À venir)npm run deploy:all:sepolia
+
+- ⏳ Interface React/Next.jsnpm run deploy:all:amoy
+
+- ⏳ Connexion MetaMask```
+
+- ⏳ Dashboard de gestion d'actifs
 
 #### 🎨 Demo Deployment
 
+---
+
 Deploy with sample NFTs for testing:
 
+## 🤝 Contribution
+
 ```bash
-npm run deploy:demo:sepolia
-npm run deploy:demo:amoy
-```
 
-### Deployment Features
+Projet académique Epitech. Contributions bienvenues pour:npm run deploy:demo:sepolia
 
-All deployment scripts include:
+- 🐛 Corrections de bugsnpm run deploy:demo:amoy
+
+- 📝 Améliorations de documentation```
+
+- ✨ Nouvelles fonctionnalités
+
+- 🧪 Tests supplémentaires### Deployment Features
+
+
+
+---All deployment scripts include:
+
 - ✅ Automatic contract verification on Etherscan/PolygonScan
-- ✅ Role assignment (ADMIN, MINTER, PAUSER)
+
+## 📜 Licence- ✅ Role assignment (ADMIN, MINTER, PAUSER)
+
 - ✅ Comprehensive deployment summary
-- ✅ Save deployment info to `deployments/*.json`
+
+Projet développé dans le cadre du cursus Epitech.- ✅ Save deployment info to `deployments/*.json`
+
 - ✅ Network detection and explorer URLs
-- ✅ Post-deployment instructions
 
-📚 **Detailed guides:**
+---- ✅ Post-deployment instructions
+
+
+
+## 👥 Équipe📚 **Detailed guides:**
+
 - Quick start: [`docs/quick-deployment.md`](docs/quick-deployment.md)
-- Full guide: [`docs/deployment-guide.md`](docs/deployment-guide.md)
-- Scripts docs: [`scripts/README.md`](scripts/README.md)
 
-### ✅ Successfully Deployed Contracts
+**Epitech Paris - Promo 2026**  - Full guide: [`docs/deployment-guide.md`](docs/deployment-guide.md)
 
-#### **Ethereum Sepolia Testnet**
+Projet Blockchain de Fin d'Études- Scripts docs: [`scripts/README.md`](scripts/README.md)
 
-| Contract | Address | Verification |
-|----------|---------|--------------|
-| **KYCRegistry** | `0xD1FbE41b66f3215ebE1c2703d9f8450De23F7446` | ✅ [View on Etherscan](https://sepolia.etherscan.io/address/0xD1FbE41b66f3215ebE1c2703d9f8450De23F7446) |
-| **FungibleAssetToken** | `0x8B5927CBBb1AE0eA68577b7bBe60318F8CE09eE4` | ✅ [View on Etherscan](https://sepolia.etherscan.io/address/0x8B5927CBBb1AE0eA68577b7bBe60318F8CE09eE4) |
-| **NFTAssetToken** | See `deployments/` folder | ✅ Verified |
 
-All contracts are **verified and readable** on Etherscan!
 
-### Local Development
+---### ✅ Successfully Deployed Contracts
+
+
+
+## 🔗 Liens Utiles#### **Ethereum Sepolia Testnet**
+
+
+
+- 🌐 [Sepolia Etherscan](https://sepolia.etherscan.io)| Contract | Address | Verification |
+
+- 💧 [Sepolia Faucet](https://sepoliafaucet.com)|----------|---------|--------------|
+
+- 📖 [Hardhat Docs](https://hardhat.org/docs)| **KYCRegistry** | `0xD1FbE41b66f3215ebE1c2703d9f8450De23F7446` | ✅ [View on Etherscan](https://sepolia.etherscan.io/address/0xD1FbE41b66f3215ebE1c2703d9f8450De23F7446) |
+
+- 🛡️ [OpenZeppelin Docs](https://docs.openzeppelin.com)| **FungibleAssetToken** | `0x8B5927CBBb1AE0eA68577b7bBe60318F8CE09eE4` | ✅ [View on Etherscan](https://sepolia.etherscan.io/address/0x8B5927CBBb1AE0eA68577b7bBe60318F8CE09eE4) |
+
+- 📊 [Solidity Docs](https://docs.soliditylang.org)| **NFTAssetToken** | See `deployments/` folder | ✅ Verified |
+
+
+
+---All contracts are **verified and readable** on Etherscan!
+
+
+
+**Construit avec ❤️ pour Epitech Blockchain Project**### Local Development
+
 
 ```bash
 # Start a local Hardhat node

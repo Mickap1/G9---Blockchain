@@ -1,118 +1,233 @@
-# 📚 Documentation - Tokenized Asset Platform
+# 📚 Documentation - Plateforme de Tokenisation d'Actifs# 📚 Documentation - Tokenized Asset Platform
 
-Bienvenue dans la documentation complète de la plateforme de tokenisation d'actifs réels.
 
-[![Tests](https://img.shields.io/badge/tests-129%20passing-success)](../test)
+
+Documentation complète de la plateforme blockchain de tokenisation d'actifs réels (RWA).Bienvenue dans la documentation complète de la plateforme de tokenisation d'actifs réels.
+
+
+
+---[![Tests](https://img.shields.io/badge/tests-129%20passing-success)](../test)
+
 [![Contracts](https://img.shields.io/badge/contracts-3%2F3-success)](../contracts)
-[![Coverage](https://img.shields.io/badge/coverage-100%25%20core-brightgreen)](../test)
 
-## 📖 Table des matières
+## 📖 Guides Principaux[![Coverage](https://img.shields.io/badge/coverage-100%25%20core-brightgreen)](../test)
 
-1. [Introduction](#introduction)
-2. [Architecture du Projet](#architecture)
+
+
+### 🚀 Déploiement## 📖 Table des matières
+
+- **[Guide de Déploiement](./deployment-guide.md)** - Déploiement complet sur Sepolia
+
+- **[Guide DEX](./DEX-DEPLOYMENT-GUIDE.md)** - Configuration et utilisation du DEX1. [Introduction](#introduction)
+
+- **[Guide Oracle](./ORACLE-GUIDE.md)** - Configuration de l'Oracle de prix2. [Architecture du Projet](#architecture)
+
 3. [Contrats Principaux](#contrats)
-4. [Guides d'Utilisation](#guides)
+
+### 📘 Référence API des Contrats4. [Guides d'Utilisation](#guides)
+
 5. [État du Projet](#état-du-projet)
 
-## Introduction
+- **[KYCRegistry](./KYCRegistry.md)** - API complète du système KYC
+
+- **[FungibleAssetToken](./FungibleAssetToken.md)** - API du token ERC-20## Introduction
+
+- **[SimpleDEX](./SimpleDEX.md)** - API du DEX
 
 Cette plateforme permet la **tokenisation complète d'actifs réels** (immobilier, diamants, œuvres d'art, etc.) sur la blockchain Ethereum/Polygon avec **conformité KYC/AML intégrée**.
 
+### ✅ Confirmation de Succès
+
 ### 🎯 Objectifs du Projet
 
+- **[ORACLE-SUCCESS](./ORACLE-SUCCESS.md)** - Récapitulatif de l'implémentation Oracle
+
 - Tokeniser des actifs réels avec conformité réglementaire
-- Supporter **deux types de tokens** : Fungible (ERC-20) et Non-Fungible (ERC-721)
+
+---- Supporter **deux types de tokens** : Fungible (ERC-20) et Non-Fungible (ERC-721)
+
 - Implémenter un système KYC on-chain robuste
-- Préparer l'intégration DEX et oracle
 
-### ✅ Caractéristiques Implémentées (Phase 1 & 2)
+## 🎯 Vue d'Ensemble du Projet- Préparer l'intégration DEX et oracle
 
-#### 🪙 **Tokenisation Complète**
+
+
+### Contrats Smart Contracts### ✅ Caractéristiques Implémentées (Phase 1 & 2)
+
+
+
+Le projet comprend 5 contrats principaux:#### 🪙 **Tokenisation Complète**
+
 - ✅ **Fungible Assets (ERC-20)** - Propriété fractionnée d'actifs réels
-  - Supply management avec plafond
-  - Prix par token calculé automatiquement
-  - Métadonnées complètes (type, description, documents)
-  - Batch minting optimisé
-  
-- ✅ **Non-Fungible Assets (ERC-721)** - Actifs uniques tokenisés
-  - Données individuelles par asset (nom, valuation, certificat)
-  - Tracking de la valeur de collection
-  - Désactivation/réactivation d'assets
-  - Batch minting pour plusieurs NFTs
 
-#### 🔐 **Conformité KYC/AML**
-- ✅ **Système KYC Complet**
-  - Soumission de documents KYC
-  - Processus d'approbation avec expiration
+1. **KYCRegistry** - Gestion de la conformité KYC/AML  - Supply management avec plafond
+
+2. **FungibleAssetToken** - Token ERC-20 pour actifs fractionnés  - Prix par token calculé automatiquement
+
+3. **NFTAssetToken** - Token ERC-721 pour actifs uniques (diamants)  - Métadonnées complètes (type, description, documents)
+
+4. **SimpleDEX** - DEX avec AMM pour trading décentralisé  - Batch minting optimisé
+
+5. **SimplePriceOracle** - Oracle pour prix des NFTs  
+
+- ✅ **Non-Fungible Assets (ERC-721)** - Actifs uniques tokenisés
+
+### Déploiements Actifs (Sepolia)  - Données individuelles par asset (nom, valuation, certificat)
+
+  - Tracking de la valeur de collection
+
+| Contrat | Adresse | Status |  - Désactivation/réactivation d'assets
+
+|---------|---------|--------|  - Batch minting pour plusieurs NFTs
+
+| KYCRegistry | `0x45d12B1D...B5b8` | ✅ Vérifié |
+
+| FungibleAssetToken | `0x6B2a38Ef...2Eb81` | ✅ Vérifié |#### 🔐 **Conformité KYC/AML**
+
+| NFTAssetToken | `0xcC1fA977...2362c` | ✅ Vérifié |- ✅ **Système KYC Complet**
+
+| SimpleDEX | `0x28B2c6b3...E7F4` | ✅ Vérifié |  - Soumission de documents KYC
+
+| SimplePriceOracle | `0x602571F0...75C7` | ✅ Vérifié |  - Processus d'approbation avec expiration
+
   - Révocation et rejet
-  - Batch approval pour plusieurs utilisateurs
+
+---  - Batch approval pour plusieurs utilisateurs
+
   
-- ✅ **Whitelist & Blacklist**
+
+## 🔧 Configuration Requise- ✅ **Whitelist & Blacklist**
+
   - Whitelist : Seules les adresses KYC approuvées peuvent trader
-  - Blacklist : Révocation immédiate (prioritaire sur whitelist)
+
+### Variables d'Environnement  - Blacklist : Révocation immédiate (prioritaire sur whitelist)
+
   - Enforcement on-chain dans `_update()` hooks
 
-#### 🛡️ **Sécurité & Contrôle**
-- ✅ **Access Control** - Rôles granulaires (ADMIN, MINTER, PAUSER, KYC_ADMIN)
-- ✅ **Pausable** - Arrêt d'urgence des transferts
+```env
+
+# Wallet (ne JAMAIS commit!)#### 🛡️ **Sécurité & Contrôle**
+
+PRIVATE_KEY=your_private_key- ✅ **Access Control** - Rôles granulaires (ADMIN, MINTER, PAUSER, KYC_ADMIN)
+
+PRIVATE_KEY_2=your_second_private_key  # Optionnel- ✅ **Pausable** - Arrêt d'urgence des transferts
+
 - ✅ **Burnable** - Destruction de tokens par les détenteurs
-- ✅ **Custom Errors** - Gestion d'erreurs gas-efficient
-- ✅ **Event Emissions** - Audit trail complet
 
-#### 🧪 **Qualité & Tests**
-- ✅ **129 tests passants** (0 échecs)
-- ✅ **100% coverage** des fonctions critiques
+# RPC Provider- ✅ **Custom Errors** - Gestion d'erreurs gas-efficient
+
+ALCHEMY_API_KEY=your_alchemy_api_key- ✅ **Event Emissions** - Audit trail complet
+
+
+
+# Contract Verification#### 🧪 **Qualité & Tests**
+
+ETHERSCAN_API_KEY=your_etherscan_api_key- ✅ **129 tests passants** (0 échecs)
+
+```- ✅ **100% coverage** des fonctions critiques
+
 - ✅ **Edge cases** couverts
-- ✅ **Integration scenarios** testés
 
-## Architecture
+### Prérequis Système- ✅ **Integration scenarios** testés
 
-```
-┌───────────────────────────────────────────────────────────────┐
+
+
+- Node.js >= 18.0.0## Architecture
+
+- npm >= 9.0.0
+
+- Git```
+
+- MetaMask ou wallet Web3┌───────────────────────────────────────────────────────────────┐
+
 │                    TOKENIZATION LAYER                         │
-├───────────────────────────────────────────────────────────────┤
+
+---├───────────────────────────────────────────────────────────────┤
+
 │                                                               │
-│  ┌────────────────────────────┐  ┌─────────────────────────┐ │
+
+## 💡 Commandes Rapides│  ┌────────────────────────────┐  ┌─────────────────────────┐ │
+
 │  │  FungibleAssetToken        │  │  NFTAssetToken          │ │
-│  │  (ERC-20)                  │  │  (ERC-721)              │ │
-│  │                            │  │                         │ │
-│  │ • Propriété fractionnée    │  │ • Actifs uniques        │ │
-│  │ • Supply cap               │  │ • Asset data tracking   │ │
+
+```bash│  │  (ERC-20)                  │  │  (ERC-721)              │ │
+
+# Tests│  │                            │  │                         │ │
+
+npx hardhat test                                    # Tous les tests (168)│  │ • Propriété fractionnée    │  │ • Actifs uniques        │ │
+
+npx hardhat test test/SimpleDEX.test.ts            # Test spécifique│  │ • Supply cap               │  │ • Asset data tracking   │ │
+
 │  │ • Prix/token calculé       │  │ • Valuation updates     │ │
-│  │ • Batch minting            │  │ • Certificate URIs      │ │
-│  │ • Burn & Pause             │  │ • Collection value      │ │
-│  └─────────────┬──────────────┘  └───────────┬─────────────┘ │
+
+# Déploiement│  │ • Batch minting            │  │ • Certificate URIs      │ │
+
+npx hardhat run scripts/deploy-all.ts --network sepolia│  │ • Burn & Pause             │  │ • Collection value      │ │
+
+npx hardhat run scripts/deploy-oracle.ts --network sepolia│  └─────────────┬──────────────┘  └───────────┬─────────────┘ │
+
 │                │                              │               │
-│                └──────────────┬───────────────┘               │
-│                               │                               │
-└───────────────────────────────┼───────────────────────────────┘
+
+# Monitoring│                └──────────────┬───────────────┘               │
+
+npx hardhat run scripts/check-prices.ts --network sepolia│                               │                               │
+
+npx hardhat run scripts/check-accounts-status.ts --network sepolia└───────────────────────────────┼───────────────────────────────┘
+
                                 │
-                                │ Vérifie KYC/Whitelist/Blacklist
-                                ▼
-┌───────────────────────────────────────────────────────────────┐
+
+# Trading                                │ Vérifie KYC/Whitelist/Blacklist
+
+npx hardhat run scripts/trade-tokens.ts --network sepolia                                ▼
+
+```┌───────────────────────────────────────────────────────────────┐
+
 │                    COMPLIANCE LAYER                           │
-├───────────────────────────────────────────────────────────────┤
+
+---├───────────────────────────────────────────────────────────────┤
+
 │                                                               │
-│                      KYCRegistry                              │
+
+## 📊 Statistiques du Projet│                      KYCRegistry                              │
+
 │                                                               │
-│  • Soumission KYC (documents IPFS)                           │
-│  • Approbation avec expiration                               │
-│  • Révocation & Rejet                                        │
-│  • Whitelist (KYC approuvé + non expiré)                    │
-│  • Blacklist (priorité sur whitelist)                       │
+
+- **168 tests** unitaires (100% passing)│  • Soumission KYC (documents IPFS)                           │
+
+- **5 contrats** déployés et vérifiés│  • Approbation avec expiration                               │
+
+- **2,000+ lignes** de Solidity│  • Révocation & Rejet                                        │
+
+- **17 scripts** utilitaires│  • Whitelist (KYC approuvé + non expiré)                    │
+
+- **100% coverage** des fonctions critiques│  • Blacklist (priorité sur whitelist)                       │
+
 │  • Batch operations                                          │
-│  • Role-based access (KYC_ADMIN)                            │
+
+---│  • Role-based access (KYC_ADMIN)                            │
+
 │                                                               │
-└───────────────────────────────────────────────────────────────┘
+
+## 🔗 Liens Utiles└───────────────────────────────────────────────────────────────┘
+
 ```
 
-### Flux de Transfer
+- [README Principal](../README.md)
 
-```mermaid
+- [Scripts Documentation](../scripts/README.md)### Flux de Transfer
+
+- [Sepolia Etherscan](https://sepolia.etherscan.io)
+
+- [Alchemy Dashboard](https://dashboard.alchemy.com)```mermaid
+
 graph TD
-    A[User A veut transférer] --> B{Blacklist?}
+
+---    A[User A veut transférer] --> B{Blacklist?}
+
     B -->|Oui| C[❌ Revert: SenderBlacklisted]
-    B -->|Non| D{Whitelist?}
+
+**Documentation mise à jour:** 17 Octobre 2025    B -->|Non| D{Whitelist?}
+
     D -->|Non| E[❌ Revert: SenderNotWhitelisted]
     D -->|Oui| F{Recipient Blacklist?}
     F -->|Oui| G[❌ Revert: RecipientBlacklisted]
