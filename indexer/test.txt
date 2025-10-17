@@ -1,0 +1,11 @@
+# Health check
+curl http://localhost:3001/health
+
+# Get stats
+curl http://localhost:3001/api/stats
+
+# Get trades
+curl http://localhost:3001/api/trades
+
+# Get user transfers
+curl http://localhost:3001/api/transfers/0xVotreAdresse
