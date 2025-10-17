@@ -1,12 +1,12 @@
 {
   "contract": "NFTAssetToken",
-  "address": "0xcC1fA977E3c47D3758117De61218208c1282362c",
-  "kycRegistry": "0x45d12B1D574608a98C7b6E7023330AF260b0B5b8",
+  "address": "0xfD543B8E77B49b959fB6612c0A4EB58a3877Aa0c",
+  "kycRegistry": "0xfe76525CeBFAE6Ec05324553F559B4b22Acd328a",
   "network": "sepolia",
   "chainId": 11155111,
   "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
-  "deployedAt": "2025-10-17T11:58:29.449Z",
-  "explorerUrl": "https://sepolia.etherscan.io/address/0xcC1fA977E3c47D3758117De61218208c1282362c",
+  "deployedAt": "2025-10-17T15:49:35.321Z",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0xfD543B8E77B49b959fB6612c0A4EB58a3877Aa0c",
   "parameters": {
     "name": "Tokenized GIA Diamonds",
     "symbol": "TDMD",

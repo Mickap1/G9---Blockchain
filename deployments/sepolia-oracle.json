@@ -1,0 +1,9 @@
+{
+  "contract": "SimplePriceOracle",
+  "address": "0x4F11C544935Be5d9e22cf719c5e3BEFBb9605475",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "deployedAt": "2025-10-17T15:49:35.321Z",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0x4F11C544935Be5d9e22cf719c5e3BEFBb9605475"
+}

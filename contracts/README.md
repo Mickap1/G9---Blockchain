@@ -97,12 +97,12 @@ Tous les contrats utilisent :
 
 | Contrat | Lignes | Fonctions | Tests |
 |---------|--------|-----------|-------|
-| KYCregistry.sol | ~200 | 15+ | 87 |
+| KYCregistry.sol | ~200 | 15+ | 52 |
 | FungibleAssetToken.sol | ~350 | 20+ | 36 |
-| NFTAssetToken.sol | ~400 | 25+ | 106 |
+| NFTAssetToken.sol | ~400 | 25+ | 41 |
 | DEX.sol | ~420 | 15+ | 39 |
-| Oracle.sol | ~350 | 15+ | 30 |
-| **Total** | **~1,720** | **90+** | **298** |
+| Oracle.sol | ~350 | 15+ | 22 |
+| **Total** | **~1,720** | **90+** | **190** |
 
 ---
 

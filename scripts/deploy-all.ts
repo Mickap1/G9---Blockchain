@@ -4,10 +4,12 @@ import * as fs from "fs";
 /**
  * Deploy All Contracts
  * 
- * Deploys all 3 contracts in the correct order:
+ * Deploys all 5 contracts in the correct order:
  * 1. KYCRegistry (independent)
  * 2. FungibleAssetToken (requires KYCRegistry)
  * 3. NFTAssetToken (requires KYCRegistry)
+ * 4. SimplePriceOracle (independent)
+ * 5. SimpleDEX (requires KYCRegistry and SimplePriceOracle)
  * 
  * Usage:
  *   npx hardhat run scripts/deploy-all.ts --network sepolia
@@ -161,6 +163,53 @@ async function main() {
   };
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // 4️⃣  DEPLOY SimplePriceOracle
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  console.log("4️⃣  DEPLOYING SimplePriceOracle");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  
+  const SimplePriceOracle = await ethers.getContractFactory("SimplePriceOracle");
+  const oracle = await SimplePriceOracle.deploy();
+  await oracle.waitForDeployment();
+  const oracleAddress = await oracle.getAddress();
+  
+  console.log("✅ SimplePriceOracle deployed:", oracleAddress);
+  console.log(`🔗 View: ${explorerUrl}/address/${oracleAddress}\n`);
+  
+  deployedContracts.contracts.SimplePriceOracle = {
+    address: oracleAddress,
+    explorerUrl: `${explorerUrl}/address/${oracleAddress}`,
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 5️⃣  DEPLOY SimpleDEX
+  // ═══════════════════════════════════════════════════════════════════════════
+  
+  console.log("5️⃣  DEPLOYING SimpleDEX");
+  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  
+  console.log("KYC Registry:", kycAddress);
+  console.log("Oracle:      ", oracleAddress, "\n");
+  
+  const SimpleDEX = await ethers.getContractFactory("SimpleDEX");
+  const dex = await SimpleDEX.deploy(kycAddress, oracleAddress);
+  await dex.waitForDeployment();
+  const dexAddress = await dex.getAddress();
+  
+  console.log("✅ SimpleDEX deployed:", dexAddress);
+  console.log(`🔗 View: ${explorerUrl}/address/${dexAddress}\n`);
+  
+  deployedContracts.contracts.SimpleDEX = {
+    address: dexAddress,
+    explorerUrl: `${explorerUrl}/address/${dexAddress}`,
+    parameters: {
+      kycRegistry: kycAddress,
+      priceOracle: oracleAddress,
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // 🔍 VERIFY ALL CONTRACTS
   // ═══════════════════════════════════════════════════════════════════════════
   
@@ -234,6 +283,38 @@ async function main() {
         console.log("⚠️  NFTAssetToken verification failed:", error.message, "\n");
       }
     }
+    
+    // Verify SimplePriceOracle
+    try {
+      console.log("Verifying SimplePriceOracle...");
+      await run("verify:verify", {
+        address: oracleAddress,
+        constructorArguments: [],
+      });
+      console.log("✅ SimplePriceOracle verified\n");
+    } catch (error: any) {
+      if (error.message.includes("Already Verified")) {
+        console.log("ℹ️  SimplePriceOracle already verified\n");
+      } else {
+        console.log("⚠️  SimplePriceOracle verification failed:", error.message, "\n");
+      }
+    }
+    
+    // Verify SimpleDEX
+    try {
+      console.log("Verifying SimpleDEX...");
+      await run("verify:verify", {
+        address: dexAddress,
+        constructorArguments: [kycAddress, oracleAddress],
+      });
+      console.log("✅ SimpleDEX verified\n");
+    } catch (error: any) {
+      if (error.message.includes("Already Verified")) {
+        console.log("ℹ️  SimpleDEX already verified\n");
+      } else {
+        console.log("⚠️  SimpleDEX verification failed:", error.message, "\n");
+      }
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -272,6 +353,15 @@ async function main() {
   } else if (network.name === "amoy") {
     console.log("   OpenSea: ", `https://testnets.opensea.io/assets/amoy/${nftAddress}/0`);
   }
+  console.log();
+  
+  console.log("4️⃣  SimplePriceOracle");
+  console.log("   Address: ", oracleAddress);
+  console.log("   Explorer:", `${explorerUrl}/address/${oracleAddress}\n`);
+  
+  console.log("5️⃣  SimpleDEX");
+  console.log("   Address: ", dexAddress);
+  console.log("   Explorer:", `${explorerUrl}/address/${dexAddress}`);
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
   // Save deployment info
@@ -330,18 +420,53 @@ async function main() {
     JSON.stringify(nftDeployment, null, 2)
   );
   
+  const oracleDeployment = {
+    contract: "SimplePriceOracle",
+    address: oracleAddress,
+    network: network.name,
+    chainId: Number((await ethers.provider.getNetwork()).chainId),
+    deployer: deployer.address,
+    deployedAt: deployedContracts.deployedAt,
+    explorerUrl: `${explorerUrl}/address/${oracleAddress}`,
+  };
+  fs.writeFileSync(
+    `deployments/${network.name}-oracle.json`,
+    JSON.stringify(oracleDeployment, null, 2)
+  );
+  
+  const dexDeployment = {
+    contract: "SimpleDEX",
+    address: dexAddress,
+    kycRegistry: kycAddress,
+    priceOracle: oracleAddress,
+    network: network.name,
+    chainId: Number((await ethers.provider.getNetwork()).chainId),
+    deployer: deployer.address,
+    deployedAt: deployedContracts.deployedAt,
+    explorerUrl: `${explorerUrl}/address/${dexAddress}`,
+  };
+  fs.writeFileSync(
+    `deployments/${network.name}-dex.json`,
+    JSON.stringify(dexDeployment, null, 2)
+  );
+  
   console.log("💾 Individual deployment files also saved\n");
   
   console.log("📝 NEXT STEPS:");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("1. Approve addresses in KYCRegistry:");
   console.log(`   kyc.approveKYC(address)`);
-  console.log("\n2. Mint fungible tokens:");
+  console.log("\n2. Set up Oracle prices:");
+  console.log(`   oracle.updatePrice(tokenAddress, priceInUSD)`);
+  console.log("\n3. Mint fungible tokens:");
   console.log(`   fungible.mint(recipient, amount)`);
-  console.log("\n3. Mint NFTs:");
+  console.log("\n4. Mint NFTs:");
   console.log(`   nft.mintAsset(recipient, name, valuation, tokenURI, certURI)`);
-  console.log("\n4. Test transfers between KYC-approved addresses");
-  console.log("\n5. Ready for Phase 3: DEX Integration! 🚀");
+  console.log("\n5. Add liquidity to DEX:");
+  console.log(`   dex.addLiquidity(tokenAddress, amount)`);
+  console.log("\n6. Test trading on DEX:");
+  console.log(`   dex.buyTokens(tokenAddress, amount)`);
+  console.log("\n7. Complete ecosystem ready! 🚀");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 }
 

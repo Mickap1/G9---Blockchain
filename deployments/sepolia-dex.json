@@ -1,0 +1,11 @@
+{
+  "contract": "SimpleDEX",
+  "address": "0x3Ba1e9dC96F9d56e8F6440fA246b1c87A3dCbA41",
+  "kycRegistry": "0xfe76525CeBFAE6Ec05324553F559B4b22Acd328a",
+  "priceOracle": "0x4F11C544935Be5d9e22cf719c5e3BEFBb9605475",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "deployedAt": "2025-10-17T15:49:35.321Z",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0x3Ba1e9dC96F9d56e8F6440fA246b1c87A3dCbA41"
+}
