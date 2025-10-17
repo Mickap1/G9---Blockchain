@@ -1,0 +1,19 @@
+{
+  "contract": "FungibleAssetToken",
+  "address": "0xDcC17380922BDe37625cE3769e1683AC1545814F",
+  "kycRegistry": "0x321F8e7C32027f1844dB883915608976124b6faF",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "deployedAt": "2025-10-17T10:14:06.721Z",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0xDcC17380922BDe37625cE3769e1683AC1545814F",
+  "parameters": {
+    "name": "Tokenized Real Estate Shares",
+    "symbol": "TRES",
+    "maxSupply": "1000000.0",
+    "assetName": "Premium Commercial Building - Paris La Défense",
+    "assetType": "Commercial Real Estate",
+    "location": "1 Parvis de La Défense, 92800 Puteaux, France",
+    "totalValue": "50000000.0"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "g-ing-910-par-9-1-blockchain-14",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "clean": "hardhat clean",
+    "deploy:kyc:sepolia": "hardhat run scripts/deploy-kyc.ts --network sepolia",
+    "deploy:kyc:amoy": "hardhat run scripts/deploy-kyc.ts --network amoy",
+    "deploy:fungible:sepolia": "hardhat run scripts/deploy-fungible.ts --network sepolia",
+    "deploy:fungible:amoy": "hardhat run scripts/deploy-fungible.ts --network amoy",
+    "deploy:nft:sepolia": "hardhat run scripts/deploy-nft.ts --network sepolia",
+    "deploy:nft:amoy": "hardhat run scripts/deploy-nft.ts --network amoy",
+    "deploy:all:sepolia": "hardhat run scripts/deploy-all.ts --network sepolia",
+    "deploy:all:amoy": "hardhat run scripts/deploy-all.ts --network amoy",
+    "deploy:demo:sepolia": "hardhat run scripts/deploy-nft-demo.ts --network sepolia",
+    "deploy:demo:amoy": "hardhat run scripts/deploy-nft-demo.ts --network amoy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14/issues"
+  },
+  "homepage": "https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "dotenv": "^17.2.3",
+    "hardhat": "^2.26.3"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0"
+  }
+}

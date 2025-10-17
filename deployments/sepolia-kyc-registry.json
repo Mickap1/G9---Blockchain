@@ -1,0 +1,9 @@
+{
+  "contract": "KYCRegistry",
+  "address": "0x321F8e7C32027f1844dB883915608976124b6faF",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "deployedAt": "2025-10-17T10:14:06.721Z",
+  "explorerUrl": "https://sepolia.etherscan.io/address/0x321F8e7C32027f1844dB883915608976124b6faF"
+}

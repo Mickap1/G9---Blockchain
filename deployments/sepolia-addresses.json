@@ -1,0 +1,9 @@
+{
+  "kycRegistry": "0x8E4312166Ed927C331B5950e5B8ac636841f06Eb",
+  "token": "0x6B2a38Ef30420B0AF041F014a092BEDB39F2Eb81",
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": "2025-10-17T08:24:40.812Z",
+  "verified": true
+}
