@@ -3,7 +3,9 @@ import "@nomicfoundation/hardhat-toolbox";
 import "dotenv/config";
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const PRIVATE_KEY_2 = process.env.PRIVATE_KEY_2;
 const isValidPrivateKey = PRIVATE_KEY && PRIVATE_KEY.length === 64;
+const isValidPrivateKey2 = PRIVATE_KEY_2 && PRIVATE_KEY_2.length === 64;
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -22,12 +24,12 @@ const config: HardhatUserConfig = {
     ...(isValidPrivateKey && {
       sepolia: {
         url: process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia-rpc.publicnode.com",
-        accounts: [PRIVATE_KEY],
+        accounts: isValidPrivateKey2 ? [PRIVATE_KEY, PRIVATE_KEY_2] : [PRIVATE_KEY],
         chainId: 11155111,
       },
       amoy: {
         url: process.env.AMOY_RPC_URL || "https://rpc-amoy.polygon.technology",
-        accounts: [PRIVATE_KEY],
+        accounts: isValidPrivateKey2 ? [PRIVATE_KEY, PRIVATE_KEY_2] : [PRIVATE_KEY],
         chainId: 80002,
       },
     }),

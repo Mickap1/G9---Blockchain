@@ -44,7 +44,7 @@ This platform enables the **tokenization of real-world assets** such as:
 - 🎨 **Artwork** (individual pieces via ERC-721)
 - 📊 **Company Shares** (fungible tokens via ERC-20)
 
-### ✅ Completed Features (Phase 1 & 2)
+### ✅ Completed Features (Phase 1, 2 & 3) - 60% Complete 🎯
 
 #### 🪙 **Tokenization** (100% Complete)
 - ✅ **Fungible Assets (ERC-20)**: FungibleAssetToken with supply management, pricing, and metadata
@@ -66,18 +66,23 @@ This platform enables the **tokenization of real-world assets** such as:
 - ✅ **Custom Errors**: Gas-efficient error handling
 - ✅ **Event Emissions**: Complete audit trail for all operations
 
-#### 🧪 **Testing & Quality** (129 Tests Passing)
+#### 🧪 **Testing & Quality** (168 Tests Passing)
 - ✅ **KYCRegistry**: 87 comprehensive tests
 - ✅ **FungibleAssetToken**: 36 tests covering all scenarios
 - ✅ **NFTAssetToken**: 106 tests including edge cases and integration
+- ✅ **SimpleDEX**: 39 tests for trading and liquidity
 - ✅ **100% Core Functionality Coverage**
 
-### 🚧 Remaining Work (Phase 3-5)
+#### � **On-Chain DEX Trading** (100% Complete) ✨ NEW
+- ✅ **SimpleDEX Contract**: Custom AMM with KYC enforcement
+- ✅ **Constant Product Formula**: x * y = k (Uniswap v2 style)
+- ✅ **Liquidity Pools**: Token/ETH pools with LP tokens
+- ✅ **Trading Fees**: 0.3% fee distributed to liquidity providers
+- ✅ **KYC-Compliant**: Only whitelisted users can trade/provide liquidity
+- ✅ **Slippage Protection**: Min output parameters on all swaps
+- ✅ **Security**: ReentrancyGuard, Pausable, role-based access
 
-#### 📊 **Token Trading** (Not Started)
-- ⏳ DEX Integration (Uniswap V2/V3)
-- ⏳ Liquidity Pool Creation
-- ⏳ KYC-Compliant Trading
+### 🚧 Remaining Work (Phase 4-5)
 
 #### 🔄 **Real-Time Indexer** (Not Started)
 - ⏳ Event Listener Backend

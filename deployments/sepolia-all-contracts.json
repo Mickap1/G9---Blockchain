@@ -2,15 +2,15 @@
   "network": "sepolia",
   "chainId": 11155111,
   "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
-  "deployedAt": "2025-10-17T10:14:06.721Z",
+  "deployedAt": "2025-10-17T11:58:29.449Z",
   "contracts": {
     "KYCRegistry": {
-      "address": "0x321F8e7C32027f1844dB883915608976124b6faF",
-      "explorerUrl": "https://sepolia.etherscan.io/address/0x321F8e7C32027f1844dB883915608976124b6faF"
+      "address": "0x45d12B1D574608a98C7b6E7023330AF260b0B5b8",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0x45d12B1D574608a98C7b6E7023330AF260b0B5b8"
     },
     "FungibleAssetToken": {
-      "address": "0xDcC17380922BDe37625cE3769e1683AC1545814F",
-      "explorerUrl": "https://sepolia.etherscan.io/address/0xDcC17380922BDe37625cE3769e1683AC1545814F",
+      "address": "0x8077912dF7c3904e909d636Db90DF256145Acb1A",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0x8077912dF7c3904e909d636Db90DF256145Acb1A",
       "parameters": {
         "name": "Tokenized Real Estate Shares",
         "symbol": "TRES",
@@ -22,8 +22,8 @@
       }
     },
     "NFTAssetToken": {
-      "address": "0xb9155455A622Cef9C0ed06A3DEA2d2761D249d08",
-      "explorerUrl": "https://sepolia.etherscan.io/address/0xb9155455A622Cef9C0ed06A3DEA2d2761D249d08",
+      "address": "0xcC1fA977E3c47D3758117De61218208c1282362c",
+      "explorerUrl": "https://sepolia.etherscan.io/address/0xcC1fA977E3c47D3758117De61218208c1282362c",
       "parameters": {
         "name": "Tokenized GIA Diamonds",
         "symbol": "TDMD",
