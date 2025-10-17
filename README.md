@@ -4,7 +4,7 @@
 
 **Projet Blockchain Epitech 2025-2026**
 
-[![Tests](https://img.shields.io/badge/tests-168%20passing-success)](./test)
+[![Tests](https://img.shields.io/badge/tests-190%20passing-success)](./test)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.20-blue)](https://soliditylang.org/)
 [![Hardhat](https://img.shields.io/badge/Hardhat-2.22.0-yellow)](https://hardhat.org/)
 [![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.0.0-purple)](https://www.openzeppelin.com/)
