@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RWA Indexer Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #94a3b8;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .connected {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .disconnected {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 165, 250, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(100, 165, 250, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(100, 165, 250, 0.1);
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #60a5fa;
+        }
+
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .data-table {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 165, 250, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(15, 23, 42, 0.5);
+            border-bottom: 2px solid rgba(100, 165, 250, 0.2);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #60a5fa;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid rgba(100, 165, 250, 0.1);
+        }
+
+        tbody tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #93c5fd;
+            word-break: break-all;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .badge-buy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .badge-sell {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .badge-nft {
+            background: rgba(168, 85, 247, 0.2);
+            color: #d8b4fe;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64748b;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(96, 165, 250, 0.2);
+            border-top-color: #60a5fa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .filter-input {
+            padding: 10px 15px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(100, 165, 250, 0.2);
+            border-radius: 8px;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .filter-input::placeholder {
+            color: #64748b;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(100, 165, 250, 0.1);
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💎 RWA Indexer Dashboard</h1>
+            <p class="subtitle">Real-World Assets Blockchain Indexer</p>
+            <div class="connection-status" id="connectionStatus">
+                <span class="spinner"></span> Connecting...
+            </div>
+        </header>
+
+        <button class="refresh-btn" onclick="refreshAllData()">🔄 Refresh Data</button>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Swaps</div>
+                <div class="stat-value" id="totalSwaps">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Transfers</div>
+                <div class="stat-value" id="totalTransfers">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">NFT Mints</div>
+                <div class="stat-value" id="totalNFTs">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Trading Volume</div>
+                <div class="stat-value" id="totalVolume">-</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('swaps')">📊 Swaps</button>
+            <button class="tab" onclick="switchTab('transfers')">💸 Transfers</button>
+            <button class="tab" onclick="switchTab('nfts')">💎 NFTs</button>
+            <button class="tab" onclick="switchTab('prices')">💰 Prices</button>
+            <button class="tab" onclick="switchTab('liquidity')">🏊 Liquidity</button>
+        </div>
+
+        <!-- Swaps Tab -->
+        <div id="swaps" class="tab-content active">
+            <input type="text" class="filter-input" id="swapFilter" placeholder="Filter by address...">
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>User</th>
+                            <th>Amount In</th>
+                            <th>Amount Out</th>
+                            <th>Block</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="swapsTable">
+                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Transfers Tab -->
+        <div id="transfers" class="tab-content">
+            <input type="text" class="filter-input" id="transferFilter" placeholder="Filter by address...">
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Amount/ID</th>
+                            <th>Block</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transfersTable">
+                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- NFTs Tab -->
+        <div id="nfts" class="tab-content">
+            <input type="text" class="filter-input" id="nftFilter" placeholder="Filter by owner...">
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token ID</th>
+                            <th>Owner</th>
+                            <th>Name</th>
+                            <th>Valuation</th>
+                            <th>Block</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nftsTable">
+                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Prices Tab -->
+        <div id="prices" class="tab-content">
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Token Address</th>
+                            <th>Token ID</th>
+                            <th>Old Price</th>
+                            <th>New Price</th>
+                            <th>Block</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricesTable">
+                        <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Liquidity Tab -->
+        <div id="liquidity" class="tab-content">
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Provider</th>
+                            <th>Tokens</th>
+                            <th>ETH</th>
+                            <th>LP Minted/Burned</th>
+                            <th>Block</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="liquidityTable">
+                        <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>🔗 Connected to RWA Indexer API | Last updated: <span id="lastUpdate">-</span></p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001/api';
+        let allData = {};
+        let autoRefreshInterval;
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkConnection();
+            refreshAllData();
+            startAutoRefresh();
+
+            // Add event listeners for filters
+            document.getElementById('swapFilter').addEventListener('input', filterSwaps);
+            document.getElementById('transferFilter').addEventListener('input', filterTransfers);
+            document.getElementById('nftFilter').addEventListener('input', filterNFTs);
+        });
+
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    updateConnectionStatus(true);
+                } else {
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.innerHTML = '🟢 Connected';
+                status.className = 'connection-status connected';
+            } else {
+                status.innerHTML = '🔴 Disconnected';
+                status.className = 'connection-status disconnected';
+            }
+        }
+
+        async function refreshAllData() {
+            try {
+                updateConnectionStatus(true);
+                
+                // Fetch all data in parallel
+                const [stats, swaps, transfers, nfts, prices, liquidity] = await Promise.all([
+                    fetch(`${API_URL}/stats`).then(r => r.json()),
+                    fetch(`${API_URL}/swaps?limit=50`).then(r => r.json()),
+                    fetch(`${API_URL}/transfers?limit=50`).then(r => r.json()),
+                    fetch(`${API_URL}/nfts`).then(r => r.json()),
+                    fetch(`${API_URL}/prices?limit=50`).then(r => r.json()),
+                    fetch(`${API_URL}/liquidity?limit=50`).then(r => r.json())
+                ]);
+
+                // Store data
+                allData = { swaps, transfers, nfts, prices, liquidity };
+
+                // Update stats
+                updateStats(stats.data);
+
+                // Update tables
+                updateSwapsTable(swaps.data);
+                updateTransfersTable(transfers.data);
+                updateNFTsTable(nfts.data);
+                updatePricesTable(prices.data);
+                updateLiquidityTable(liquidity.data);
+
+                // Update last update time
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalSwaps').textContent = stats.totalSwaps || 0;
+            document.getElementById('totalTransfers').textContent = stats.totalTransfers || 0;
+            document.getElementById('totalNFTs').textContent = stats.totalNFTs || 0;
+            
+            const volume = stats.totalVolumeETH ? parseFloat(stats.totalVolumeETH) / 1e18 : 0;
+            document.getElementById('totalVolume').textContent = volume.toFixed(2) + ' ETH';
+        }
+
+        function updateSwapsTable(swaps) {
+            const tbody = document.getElementById('swapsTable');
+            if (!swaps || swaps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No swaps yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = swaps.map(swap => `
+                <tr>
+                    <td><span class="badge ${swap.type === 'buy' ? 'badge-buy' : 'badge-sell'}">${swap.type.toUpperCase()}</span></td>
+                    <td class="address">${swap.type === 'buy' ? swap.buyer : swap.seller}</td>
+                    <td>${swap.type === 'buy' ? (parseFloat(swap.ethIn) / 1e18).toFixed(4) + ' ETH' : (parseFloat(swap.tokensIn) / 1e18).toFixed(2) + ' tokens'}</td>
+                    <td>${swap.type === 'buy' ? (parseFloat(swap.tokensOut) / 1e18).toFixed(2) + ' tokens' : (parseFloat(swap.ethOut) / 1e18).toFixed(4) + ' ETH'}</td>
+                    <td>${swap.blockNumber}</td>
+                    <td>${new Date(swap.timestamp * 1000).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateTransfersTable(transfers) {
+            const tbody = document.getElementById('transfersTable');
+            if (!transfers || transfers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No transfers yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = transfers.map(transfer => `
+                <tr>
+                    <td><span class="badge badge-nft">${transfer.tokenType.toUpperCase()}</span></td>
+                    <td class="address">${transfer.from}</td>
+                    <td class="address">${transfer.to}</td>
+                    <td>${transfer.tokenType === 'nft' ? '#' + transfer.tokenId : (parseFloat(transfer.value) / 1e18).toFixed(2) + ' tokens'}</td>
+                    <td>${transfer.blockNumber}</td>
+                    <td>${new Date(transfer.createdAt).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateNFTsTable(nfts) {
+            const tbody = document.getElementById('nftsTable');
+            if (!nfts || nfts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No NFTs minted yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = nfts.map(nft => `
+                <tr>
+                    <td>#${nft.tokenId}</td>
+                    <td class="address">${nft.owner}</td>
+                    <td>${nft.name}</td>
+                    <td>${(parseFloat(nft.valuation) / 1e18).toFixed(2)} ETH</td>
+                    <td>${nft.blockNumber}</td>
+                    <td>${new Date(nft.timestamp * 1000).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePricesTable(prices) {
+            const tbody = document.getElementById('pricesTable');
+            if (!prices || prices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="no-data">No price updates yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = prices.map(price => `
+                <tr>
+                    <td class="address">${price.tokenAddress}</td>
+                    <td>${price.tokenId}</td>
+                    <td>${(parseFloat(price.oldPrice) / 1e18).toFixed(4)}</td>
+                    <td>${(parseFloat(price.newPrice) / 1e18).toFixed(4)}</td>
+                    <td>${price.blockNumber}</td>
+                    <td>${new Date(price.timestamp * 1000).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateLiquidityTable(liquidity) {
+            const tbody = document.getElementById('liquidityTable');
+            if (!liquidity || liquidity.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="no-data">No liquidity events yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = liquidity.map(liq => `
+                <tr>
+                    <td><span class="badge badge-buy">${liq.type.toUpperCase()}</span></td>
+                    <td class="address">${liq.provider}</td>
+                    <td>${(parseFloat(liq.tokenAmount) / 1e18).toFixed(2)}</td>
+                    <td>${(parseFloat(liq.ethAmount) / 1e18).toFixed(4)}</td>
+                    <td>${(parseFloat(liq.liquidityMinted || liq.liquidityBurned) / 1e18).toFixed(2)}</td>
+                    <td>${liq.blockNumber}</td>
+                    <td>${new Date(liq.timestamp * 1000).toLocaleTimeString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function filterSwaps() {
+            const filter = document.getElementById('swapFilter').value.toLowerCase();
+            const filteredSwaps = allData.swaps?.data?.filter(swap => {
+                const user = (swap.buyer || swap.seller).toLowerCase();
+                return user.includes(filter);
+            }) || [];
+            updateSwapsTable(filteredSwaps);
+        }
+
+        function filterTransfers() {
+            const filter = document.getElementById('transferFilter').value.toLowerCase();
+            const filteredTransfers = allData.transfers?.data?.filter(transfer => {
+                return transfer.from.toLowerCase().includes(filter) || transfer.to.toLowerCase().includes(filter);
+            }) || [];
+            updateTransfersTable(filteredTransfers);
+        }
+
+        function filterNFTs() {
+            const filter = document.getElementById('nftFilter').value.toLowerCase();
+            const filteredNFTs = allData.nfts?.data?.filter(nft => {
+                return nft.owner.toLowerCase().includes(filter) || nft.name.toLowerCase().includes(filter);
+            }) || [];
+            updateNFTsTable(filteredNFTs);
+        }
+
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(() => {
+                refreshAllData();
+            }, 30000); // Refresh every 30 seconds
+        }
+    </script>
+</body>
+</html>
