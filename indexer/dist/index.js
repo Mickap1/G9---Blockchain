@@ -7,11 +7,15 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 const database_1 = require("./config/database");
 const eventListener_1 = require("./services/eventListener");
 const logger_1 = require("./utils/logger");
 const routes_1 = __importDefault(require("./api/routes"));
-dotenv_1.default.config();
+// Charger le .env depuis le dossier indexer/ (fonctionne en dev et après compilation)
+const envPath = path_1.default.resolve(__dirname, "../../indexer/.env");
+dotenv_1.default.config({ path: envPath });
+logger_1.logger.info(`Loading .env from: ${envPath}`);
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3001;
 // Middleware

@@ -59,6 +59,14 @@ async function indexDEXEvents(range) {
         if (!(event instanceof ethers_1.EventLog))
             continue;
         const args = event.args;
+        // 🎉 LOG DÉTAILLÉ DE L'ÉVÉNEMENT
+        logger_1.logger.info(`🔔 NOUVEAU SWAP DÉTECTÉ !`);
+        logger_1.logger.info(`   Type: ACHAT (BUY)`);
+        logger_1.logger.info(`   Acheteur: ${args.buyer}`);
+        logger_1.logger.info(`   ETH envoyé: ${ethers_1.ethers.formatEther(args.ethIn)} ETH`);
+        logger_1.logger.info(`   Tokens reçus: ${ethers_1.ethers.formatEther(args.tokensOut)} tokens`);
+        logger_1.logger.info(`   Bloc: ${event.blockNumber}`);
+        logger_1.logger.info(`   TX: https://sepolia.etherscan.io/tx/${event.transactionHash}`);
         await db.collection("swaps").insertOne({
             type: "buy",
             buyer: args.buyer,
@@ -77,6 +85,14 @@ async function indexDEXEvents(range) {
         if (!(event instanceof ethers_1.EventLog))
             continue;
         const args = event.args;
+        // 🎉 LOG DÉTAILLÉ DE L'ÉVÉNEMENT
+        logger_1.logger.info(`🔔 NOUVEAU SWAP DÉTECTÉ !`);
+        logger_1.logger.info(`   Type: VENTE (SELL)`);
+        logger_1.logger.info(`   Vendeur: ${args.seller}`);
+        logger_1.logger.info(`   Tokens vendus: ${ethers_1.ethers.formatEther(args.tokensIn)} tokens`);
+        logger_1.logger.info(`   ETH reçu: ${ethers_1.ethers.formatEther(args.ethOut)} ETH`);
+        logger_1.logger.info(`   Bloc: ${event.blockNumber}`);
+        logger_1.logger.info(`   TX: https://sepolia.etherscan.io/tx/${event.transactionHash}`);
         await db.collection("swaps").insertOne({
             type: "sell",
             seller: args.seller,
@@ -121,6 +137,13 @@ async function indexTokenTransfers(range) {
         if (args.from === ethers_1.ethers.ZeroAddress || args.to === ethers_1.ethers.ZeroAddress) {
             continue;
         }
+        // 🎉 LOG DÉTAILLÉ DU TRANSFERT
+        logger_1.logger.info(`🔔 NOUVEAU TRANSFERT DE TOKENS DÉTECTÉ !`);
+        logger_1.logger.info(`   De: ${args.from}`);
+        logger_1.logger.info(`   Vers: ${args.to}`);
+        logger_1.logger.info(`   Montant: ${ethers_1.ethers.formatEther(args.value)} tokens`);
+        logger_1.logger.info(`   Bloc: ${event.blockNumber}`);
+        logger_1.logger.info(`   TX: https://sepolia.etherscan.io/tx/${event.transactionHash}`);
         await db.collection("transfers").insertOne({
             tokenType: "fungible",
             from: args.from,
@@ -142,6 +165,14 @@ async function indexNFTEvents(range) {
         if (!(event instanceof ethers_1.EventLog))
             continue;
         const args = event.args;
+        // 🎉 LOG DÉTAILLÉ DU MINT NFT
+        logger_1.logger.info(`🔔 NOUVEAU NFT MINTÉ !`);
+        logger_1.logger.info(`   Token ID: #${args.tokenId}`);
+        logger_1.logger.info(`   Owner: ${args.owner}`);
+        logger_1.logger.info(`   Nom: ${args.name}`);
+        logger_1.logger.info(`   Valuation: ${ethers_1.ethers.formatEther(args.valuation)} ETH`);
+        logger_1.logger.info(`   Bloc: ${event.blockNumber}`);
+        logger_1.logger.info(`   TX: https://sepolia.etherscan.io/tx/${event.transactionHash}`);
         await db.collection("nft_mints").insertOne({
             tokenId: Number(args.tokenId),
             owner: args.owner,

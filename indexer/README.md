@@ -34,7 +34,7 @@ Create a `.env` file in the `indexer/` directory:
 SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 
 # Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority
+MONGODB_URI=
 DB_NAME=rwa_indexer
 
 # API Server

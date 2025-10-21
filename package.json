@@ -33,10 +33,22 @@
   "homepage": "https://github.com/EpitechPGE45-2025/G-ING-910-PAR-9-1-blockchain-14#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.9.1",
+    "@types/node-cron": "^3.0.11",
     "dotenv": "^17.2.3",
-    "hardhat": "^2.26.3"
+    "hardhat": "^2.26.3",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.4.0"
+    "@openzeppelin/contracts": "^5.4.0",
+    "cors": "^2.8.5",
+    "ethers": "^6.15.0",
+    "express": "^5.1.0",
+    "mongodb": "^6.20.0",
+    "node-cron": "^4.2.1",
+    "winston": "^3.18.3"
   }
 }

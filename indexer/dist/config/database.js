@@ -4,13 +4,14 @@ exports.connectDatabase = connectDatabase;
 exports.disconnectDatabase = disconnectDatabase;
 exports.getDatabase = getDatabase;
 const mongodb_1 = require("mongodb");
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-const DB_NAME = process.env.DB_NAME || "rwa_indexer";
 let db = null;
 let client = null;
 async function connectDatabase() {
     if (db)
         return db;
+    // Lire les variables d'environnement ici, pas en haut du fichier
+    const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
+    const DB_NAME = process.env.DB_NAME || "rwa_indexer";
     try {
         client = new mongodb_1.MongoClient(MONGODB_URI);
         await client.connect();
