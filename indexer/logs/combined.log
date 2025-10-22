@@ -383,3 +383,6 @@
 2025-10-21 16:12:01 [[32minfo[39m]: ✅ Indexed blocks 9459423 to 9459428
 2025-10-21 16:12:16 [[32minfo[39m]: 
 👋 Shutting down gracefully...
+2025-10-22 13:06:21 [[32minfo[39m]: Loading .env from: C:\Users\mrori\Bureau\Epitech\blockchain\Project\indexer\.env
+2025-10-22 13:06:21 [[32minfo[39m]: 🚀 Starting RWA Indexer...
+2025-10-22 13:06:51 [[31merror[39m]: ❌ Failed to start indexer: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017

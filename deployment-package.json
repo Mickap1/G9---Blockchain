@@ -1,0 +1,14 @@
+{
+  "name": "rwa-indexer-deployment",
+  "version": "1.0.0",
+  "scripts": {
+    "docker:build": "docker build -t rwa-indexer .",
+    "docker:run": "docker run -d -p 3001:3001 --env-file indexer/.env --name rwa-indexer rwa-indexer",
+    "docker:stop": "docker stop rwa-indexer && docker rm rwa-indexer",
+    "docker:logs": "docker logs -f rwa-indexer",
+    "docker:test": "npm run docker:build && npm run docker:run && timeout 10 && curl http://localhost:3001/api/health",
+    "railway:deploy": "railway up",
+    "railway:logs": "railway logs",
+    "prepare:deploy": "cd indexer && npm run build"
+  }
+}
