@@ -14,7 +14,8 @@ dotenv.config({ path: envPath });
 logger.info(`Loading .env from: ${envPath}`);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || "3001", 10);
+const HOST = process.env.HOST || "0.0.0.0";
 
 // Middleware
 app.use(cors());
@@ -51,11 +52,12 @@ async function main() {
     logger.info("✅ Cron job scheduled (every minute)");
 
     // Démarrer le serveur API
-    app.listen(PORT, () => {
-      logger.info(`🌐 API Server running on http://localhost:${PORT}`);
-      logger.info(`📊 Health check: http://localhost:${PORT}/api/health`);
-      logger.info(`💱 Swaps API: http://localhost:${PORT}/api/swaps`);
-      logger.info(`📈 Stats API: http://localhost:${PORT}/api/stats`);
+    const HOST = process.env.HOST || "0.0.0.0";
+    app.listen(PORT, HOST, () => {
+      logger.info(`🌐 API Server running on http://${HOST}:${PORT}`);
+      logger.info(`📊 Health check: http://${HOST}:${PORT}/api/health`);
+      logger.info(`💱 Swaps API: http://${HOST}:${PORT}/api/swaps`);
+      logger.info(`📈 Stats API: http://${HOST}:${PORT}/api/stats`);
     });
 
   } catch (error) {
