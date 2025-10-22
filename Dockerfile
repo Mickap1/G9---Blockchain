@@ -37,5 +37,8 @@ EXPOSE 3001
 ENV NODE_ENV=production
 ENV PORT=3001
 
+# S'assurer que le répertoire de travail final est correct
+WORKDIR /app/indexer
+
 # Démarrer l'application
-CMD ["node", "dist/index.js"]
+CMD ["node", "/app/indexer/dist/index.js"]
