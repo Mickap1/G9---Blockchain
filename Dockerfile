@@ -41,4 +41,8 @@ ENV PORT=3001
 WORKDIR /app/indexer
 
 # Démarrer l'application
-CMD ["node", "/app/indexer/dist/index.js"]
+# Copier le script de démarrage résilient et l'utiliser
+COPY indexer/start.sh /app/indexer/start.sh
+RUN chmod +x /app/indexer/start.sh
+
+CMD ["sh", "/app/indexer/start.sh"]
