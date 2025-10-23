@@ -5,3 +5,4 @@
 2025-10-22 13:18:56 [[31merror[39m]: ❌ Failed to start indexer: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
 2025-10-22 13:21:44 [[31merror[39m]: ❌ Failed to start indexer: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
 2025-10-22 13:23:01 [[31merror[39m]: ❌ Failed to start indexer: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-10-22 14:09:15 [[31merror[39m]: ❌ Failed to start indexer: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017

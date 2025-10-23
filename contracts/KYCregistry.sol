@@ -33,6 +33,10 @@ contract KYCRegistry is AccessControl {
     // ========== STATE VARIABLES ==========
     mapping(address => KYCData) private _kycData;
     
+    // Arrays to track addresses by status
+    address[] private _allAddresses;
+    mapping(address => bool) private _addressExists;
+    
     // ========== EVENTS ==========
     event KYCSubmitted(address indexed user, string dataURI, uint256 timestamp);
     event KYCApproved(address indexed user, uint256 expiryDate, uint256 timestamp);
@@ -65,6 +69,12 @@ contract KYCRegistry is AccessControl {
             _kycData[msg.sender].status == KYCStatus.Rejected,
             "KYCRegistry: KYC already submitted"
         );
+        
+        // Track new address
+        if (!_addressExists[msg.sender]) {
+            _allAddresses.push(msg.sender);
+            _addressExists[msg.sender] = true;
+        }
         
         _kycData[msg.sender] = KYCData({
             status: KYCStatus.Pending,
@@ -217,5 +227,148 @@ contract KYCRegistry is AccessControl {
                isWhitelisted(to) && 
                !isBlacklisted(from) && 
                !isBlacklisted(to);
+    }
+    
+    // ========== LISTING FUNCTIONS ==========
+    
+    /**
+     * @notice Get all addresses that have ever interacted with KYC
+     * @return address[] Array of all addresses
+     */
+    function getAllAddresses() external view returns (address[] memory) {
+        return _allAddresses;
+    }
+    
+    /**
+     * @notice Get count of all addresses
+     * @return uint256 Total number of addresses
+     */
+    function getAddressCount() external view returns (uint256) {
+        return _allAddresses.length;
+    }
+    
+    /**
+     * @notice Get addresses by status with pagination
+     * @param status The KYC status to filter by
+     * @param offset Starting index
+     * @param limit Maximum number of results
+     * @return addresses Array of addresses with the given status
+     * @return total Total count of addresses with this status
+     */
+    function getAddressesByStatus(
+        KYCStatus status,
+        uint256 offset,
+        uint256 limit
+    ) external view returns (address[] memory addresses, uint256 total) {
+        // First pass: count addresses with this status
+        uint256 count = 0;
+        for (uint256 i = 0; i < _allAddresses.length; i++) {
+            if (_kycData[_allAddresses[i]].status == status) {
+                count++;
+            }
+        }
+        
+        // Calculate actual limit
+        uint256 end = offset + limit;
+        if (end > count) {
+            end = count;
+        }
+        
+        // If offset is beyond count, return empty array
+        if (offset >= count) {
+            return (new address[](0), count);
+        }
+        
+        // Second pass: collect addresses
+        address[] memory result = new address[](end - offset);
+        uint256 resultIndex = 0;
+        uint256 currentIndex = 0;
+        
+        for (uint256 i = 0; i < _allAddresses.length && resultIndex < result.length; i++) {
+            if (_kycData[_allAddresses[i]].status == status) {
+                if (currentIndex >= offset) {
+                    result[resultIndex] = _allAddresses[i];
+                    resultIndex++;
+                }
+                currentIndex++;
+            }
+        }
+        
+        return (result, count);
+    }
+    
+    /**
+     * @notice Get all addresses with a specific status (no pagination)
+     * @param status The KYC status to filter by
+     * @return address[] Array of addresses with the given status
+     */
+    function getAllAddressesByStatus(KYCStatus status) external view returns (address[] memory) {
+        // First pass: count
+        uint256 count = 0;
+        for (uint256 i = 0; i < _allAddresses.length; i++) {
+            if (_kycData[_allAddresses[i]].status == status) {
+                count++;
+            }
+        }
+        
+        // Second pass: collect
+        address[] memory result = new address[](count);
+        uint256 resultIndex = 0;
+        
+        for (uint256 i = 0; i < _allAddresses.length; i++) {
+            if (_kycData[_allAddresses[i]].status == status) {
+                result[resultIndex] = _allAddresses[i];
+                resultIndex++;
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @notice Get multiple KYC data at once
+     * @param users Array of addresses to query
+     * @return KYCData[] Array of KYC data
+     */
+    function getBatchKYCData(address[] calldata users) external view returns (KYCData[] memory) {
+        KYCData[] memory results = new KYCData[](users.length);
+        for (uint256 i = 0; i < users.length; i++) {
+            results[i] = _kycData[users[i]];
+        }
+        return results;
+    }
+    
+    /**
+     * @notice Get statistics about KYC statuses
+     * @return pending Count of pending KYCs
+     * @return approved Count of approved KYCs
+     * @return rejected Count of rejected KYCs
+     * @return blacklisted Count of blacklisted addresses
+     * @return total Total addresses
+     */
+    function getStatistics() external view returns (
+        uint256 pending,
+        uint256 approved,
+        uint256 rejected,
+        uint256 blacklisted,
+        uint256 total
+    ) {
+        total = _allAddresses.length;
+        
+        for (uint256 i = 0; i < _allAddresses.length; i++) {
+            KYCStatus status = _kycData[_allAddresses[i]].status;
+            
+            if (status == KYCStatus.Pending) {
+                pending++;
+            } else if (status == KYCStatus.Approved) {
+                approved++;
+            } else if (status == KYCStatus.Rejected) {
+                rejected++;
+            } else if (status == KYCStatus.Blacklisted) {
+                blacklisted++;
+            }
+        }
+        
+        return (pending, approved, rejected, blacklisted, total);
     }
 }

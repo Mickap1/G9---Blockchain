@@ -6,7 +6,7 @@
   "contracts": {
     "kycRegistry": "0x665dbdD8DeFcCcf0da585b48f2126cb5dde07bC8",
     "nftCollection": "0xB5dEFD641802F7d8aF51804f96877836e7231c7e"
-  },
+  },  
   "nftInfo": {
     "name": "Tokenized GIA Diamonds",
     "symbol": "TDMD",

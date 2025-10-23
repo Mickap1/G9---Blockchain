@@ -17,7 +17,8 @@ const envPath = path_1.default.resolve(__dirname, "../../indexer/.env");
 dotenv_1.default.config({ path: envPath });
 logger_1.logger.info(`Loading .env from: ${envPath}`);
 const app = (0, express_1.default)();
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || "3001", 10);
+const HOST = process.env.HOST || "0.0.0.0";
 // Middleware
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -46,11 +47,12 @@ async function main() {
         });
         logger_1.logger.info("✅ Cron job scheduled (every minute)");
         // Démarrer le serveur API
-        app.listen(PORT, () => {
-            logger_1.logger.info(`🌐 API Server running on http://localhost:${PORT}`);
-            logger_1.logger.info(`📊 Health check: http://localhost:${PORT}/api/health`);
-            logger_1.logger.info(`💱 Swaps API: http://localhost:${PORT}/api/swaps`);
-            logger_1.logger.info(`📈 Stats API: http://localhost:${PORT}/api/stats`);
+        const HOST = process.env.HOST || "0.0.0.0";
+        app.listen(PORT, HOST, () => {
+            logger_1.logger.info(`🌐 API Server running on http://${HOST}:${PORT}`);
+            logger_1.logger.info(`📊 Health check: http://${HOST}:${PORT}/api/health`);
+            logger_1.logger.info(`💱 Swaps API: http://${HOST}:${PORT}/api/swaps`);
+            logger_1.logger.info(`📈 Stats API: http://${HOST}:${PORT}/api/stats`);
         });
     }
     catch (error) {
