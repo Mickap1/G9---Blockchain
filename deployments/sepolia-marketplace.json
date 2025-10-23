@@ -1,0 +1,10 @@
+{
+  "marketplace": "0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd",
+  "kycRegistry": "0x563E31793214F193EB7993a2bfAd2957a70C7D65",
+  "feeRecipient": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "feePercentage": "250",
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "network": "sepolia",
+  "chainId": "11155111",
+  "deployedAt": "2025-10-23T14:55:01.182Z"
+}
