@@ -101,16 +101,23 @@ export default function CreateNFTPage() {
     let finalMetadataURI = metadataURI;
     
     if (metadataMode === 'manual') {
+      // Validation des champs obligatoires
       if (!assetName || !description) {
-        alert('Veuillez remplir au minimum le nom et la description');
+        alert('⚠️ Veuillez remplir le nom et la description');
         return;
       }
       
-      // For testing: Use a minimal test URI to avoid gas issues
-      // In production, this would upload to IPFS
-      finalMetadataURI = `ipfs://test-${Date.now()}`;
+      if (!imageURI) {
+        alert('⚠️ L\'image est obligatoire\n\nVeuillez fournir une URL d\'image (ex: https://i.imgur.com/xxx.png ou ipfs://xxx)');
+        return;
+      }
       
-      // Show what would be uploaded
+      if (!valuation || parseFloat(valuation) <= 0) {
+        alert('⚠️ Le prix/valuation est obligatoire\n\nVeuillez entrer un montant supérieur à 0');
+        return;
+      }
+      
+      // Build metadata object
       const metadata: any = {
         name: assetName,
         description: description,
@@ -128,15 +135,25 @@ export default function CreateNFTPage() {
         metadata.attributes = filteredAttributes;
       }
       
-      console.log('Metadata qui devrait être uploadé sur IPFS:', metadata);
-      console.log('Test URI utilisée:', finalMetadataURI);
+      // Create a proper data URI with the metadata
+      const metadataJSON = JSON.stringify(metadata);
+      const encodedMetadata = encodeURIComponent(metadataJSON);
+      finalMetadataURI = `data:application/json,${encodedMetadata}`;
       
+      console.log('Metadata object:', metadata);
+      console.log('Metadata JSON:', metadataJSON);
+      console.log('Data URI:', finalMetadataURI);
+      
+      // Show preview to user
       const confirmMint = confirm(
-        '🧪 MODE TEST\n\n' +
-        `URI de test: ${finalMetadataURI}\n\n` +
-        'Métadonnées:\n' + JSON.stringify(metadata, null, 2) + '\n\n' +
-        '⚠️ En production, uploadez sur IPFS!\n\n' +
-        'Continuer le mint avec URI de test?'
+        '📝 Vérification des métadonnées\n\n' +
+        'Nom: ' + metadata.name + '\n' +
+        'Description: ' + metadata.description + '\n' +
+        (metadata.valuation ? 'Valuation: ' + metadata.valuation + ' EUR\n' : '') +
+        (metadata.image ? 'Image: ✓\n' : 'Image: ✗\n') +
+        (filteredAttributes.length > 0 ? 'Attributs: ' + filteredAttributes.length + '\n' : '') +
+        '\n✅ Les métadonnées seront stockées on-chain (data URI)\n' +
+        '\nContinuer le mint?'
       );
       
       if (!confirmMint) return;
@@ -323,16 +340,19 @@ export default function CreateNFTPage() {
               {/* Manual Mode */}
               {metadataMode === 'manual' && (
                 <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3">
-                    <p className="text-sm text-yellow-800 font-semibold">💡 Mint Direct</p>
-                    <p className="text-xs text-yellow-700 mt-1">
-                      Champs obligatoires: nom + description. Image optionnelle.
+                  <div className="bg-blue-50 border border-blue-300 rounded-lg p-3">
+                    <p className="text-sm text-blue-800 font-semibold">💡 Mint Direct</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      ✅ Champs obligatoires: <strong>Nom, Description, Image, Prix</strong>
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      Optionnel: Certificat, Attributs
                     </p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom de l'actif *
+                      Nom de l'actif <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
@@ -347,7 +367,7 @@ export default function CreateNFTPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description *
+                      Description <span className="text-red-600">*</span>
                     </label>
                     <textarea
                       value={description}
@@ -362,7 +382,7 @@ export default function CreateNFTPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Valorisation EUR (optionnel)
+                      Valorisation EUR <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="number"
@@ -370,23 +390,29 @@ export default function CreateNFTPage() {
                       onChange={(e) => setValuation(e.target.value)}
                       placeholder="50000"
                       step="0.01"
+                      min="0.01"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                       disabled={loading}
+                      required
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Image URI (optionnel)
+                      Image URL <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
                       value={imageURI}
                       onChange={(e) => setImageURI(e.target.value)}
-                      placeholder="ipfs://... ou https://..."
+                      placeholder="ipfs://... ou https://i.imgur.com/xxx.png"
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                       disabled={loading}
+                      required
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      💡 Utilisez une URL publique (Imgur, IPFS, etc.)
+                    </p>
                   </div>
 
                   <div>

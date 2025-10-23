@@ -28,7 +28,7 @@ export default function Home() {
               <p className="text-gray-600 text-center mb-4">
                 Créer des tokens fongibles (ERC-20) pour représenter des parts d'actifs
               </p>
-              <div className="bg-green-50 p-3 rounded text-sm text-green-800">
+              <div className="bg-gray-50 p-3 rounded text-sm text-gray-800">
                 <p className="font-semibold">Exemples:</p>
                 <ul className="list-disc list-inside mt-1">
                   <li>Parts de biens immobiliers</li>
@@ -44,7 +44,7 @@ export default function Home() {
               <p className="text-gray-600 text-center mb-4">
                 Créer des NFTs (ERC-721) pour représenter des actifs uniques
               </p>
-              <div className="bg-purple-50 p-3 rounded text-sm text-purple-800">
+              <div className="bg-purple-50 p-3 rounded text-sm text-gray-800">
                 <p className="font-semibold">Exemples:</p>
                 <ul className="list-disc list-inside mt-1">
                   <li>Œuvres d'art numériques</li>
@@ -70,7 +70,7 @@ export default function Home() {
             </Link>
             
             <Link href="/marketplace" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition">
-              <Coins className="w-12 h-12 text-purple-600 mb-4" />
+              <Coins className="w-12 h-12 text-pink-600 mb-4" />
               <h3 className="text-xl font-semibold mb-2">Marketplace</h3>
               <p className="text-gray-600">Parcourir et échanger des actifs tokenisés</p>
             </Link>

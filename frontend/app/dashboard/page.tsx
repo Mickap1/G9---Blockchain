@@ -52,7 +52,7 @@ export default function DashboardPage() {
     if (!publicClient || !address) return;
 
     try {
-      const [name, symbol, balance, decimals, assetType, totalValue] = await Promise.all([
+      const [name, symbol, balance, decimals] = await Promise.all([
         publicClient.readContract({
           address: FUNGIBLE_TOKEN_ADDRESS,
           abi: FungibleTokenABI,
@@ -74,25 +74,31 @@ export default function DashboardPage() {
           abi: FungibleTokenABI,
           functionName: 'decimals',
         }),
-        publicClient.readContract({
-          address: FUNGIBLE_TOKEN_ADDRESS,
-          abi: FungibleTokenABI,
-          functionName: 'assetType',
-        }),
-        publicClient.readContract({
-          address: FUNGIBLE_TOKEN_ADDRESS,
-          abi: FungibleTokenABI,
-          functionName: 'assetValue',
-        }),
       ]);
+
+      // Try to get asset metadata (struct)
+      let assetMetadata: any = null;
+      let totalValue = 0;
+      try {
+        assetMetadata = await publicClient.readContract({
+          address: FUNGIBLE_TOKEN_ADDRESS,
+          abi: FungibleTokenABI,
+          functionName: 'assetMetadata',
+        }) as any;
+        if (assetMetadata && assetMetadata.totalValue) {
+          totalValue = Number(assetMetadata.totalValue) / 100; // Convert from cents
+        }
+      } catch (e) {
+        console.log('Could not load assetMetadata, using default values');
+      }
 
       const balanceFormatted = formatUnits(balance as bigint, decimals as number);
       setFungibleBalance(balanceFormatted);
       setFungibleTokenInfo({
         name,
         symbol,
-        assetType,
-        totalValue: Number(totalValue) / 100, // Convert from cents
+        assetType: assetMetadata?.assetType || 'Token',
+        totalValue: totalValue,
       });
     } catch (error) {
       console.error('Error loading fungible token:', error);
@@ -124,17 +130,64 @@ export default function DashboardPage() {
           let metadata = null;
           if (uri) {
             try {
+              console.log(`NFT #${Number(tokenId)} - URI:`, uri);
               if (uri.startsWith('data:application/json')) {
                 const jsonPart = uri.replace('data:application/json,', '');
-                metadata = JSON.parse(decodeURIComponent(jsonPart));
+                const decoded = decodeURIComponent(jsonPart);
+                console.log(`NFT #${Number(tokenId)} - Decoded JSON:`, decoded);
+                metadata = JSON.parse(decoded);
+                console.log(`NFT #${Number(tokenId)} - Parsed metadata:`, metadata);
+              } else if (uri.startsWith('ipfs://')) {
+                // Convert IPFS to HTTP gateway
+                const httpUrl = uri.replace('ipfs://', 'https://ipfs.io/ipfs/');
+                console.log(`NFT #${Number(tokenId)} - Fetching from IPFS:`, httpUrl);
+                try {
+                  const response = await fetch(httpUrl, { 
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                  });
+                  console.log(`NFT #${Number(tokenId)} - Response status:`, response.status, response.statusText);
+                  console.log(`NFT #${Number(tokenId)} - Content-Type:`, response.headers.get('content-type'));
+                  
+                  if (response.ok) {
+                    const text = await response.text();
+                    console.log(`NFT #${Number(tokenId)} - Response text (first 200 chars):`, text.substring(0, 200));
+                    metadata = JSON.parse(text);
+                    console.log(`NFT #${Number(tokenId)} - Parsed metadata:`, metadata);
+                  } else {
+                    console.error(`NFT #${Number(tokenId)} - Failed to fetch: ${response.status}`);
+                  }
+                } catch (fetchError) {
+                  console.error(`NFT #${Number(tokenId)} - Fetch error:`, fetchError);
+                }
               } else if (uri.startsWith('http')) {
-                // Fetch from IPFS or HTTP
-                const response = await fetch(uri);
-                metadata = await response.json();
+                // Fetch from HTTP/HTTPS
+                console.log(`NFT #${Number(tokenId)} - Fetching from HTTP:`, uri);
+                try {
+                  const response = await fetch(uri, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                  });
+                  console.log(`NFT #${Number(tokenId)} - Response status:`, response.status, response.statusText);
+                  console.log(`NFT #${Number(tokenId)} - Content-Type:`, response.headers.get('content-type'));
+                  
+                  if (response.ok) {
+                    const text = await response.text();
+                    console.log(`NFT #${Number(tokenId)} - Response text (first 200 chars):`, text.substring(0, 200));
+                    metadata = JSON.parse(text);
+                    console.log(`NFT #${Number(tokenId)} - Parsed metadata:`, metadata);
+                  } else {
+                    console.error(`NFT #${Number(tokenId)} - Failed to fetch: ${response.status}`);
+                  }
+                } catch (fetchError) {
+                  console.error(`NFT #${Number(tokenId)} - Fetch error:`, fetchError);
+                }
               }
             } catch (e) {
-              console.error('Error parsing metadata:', e);
+              console.error(`Error parsing metadata for NFT #${Number(tokenId)}:`, e, 'URI:', uri);
             }
+          } else {
+            console.log(`NFT #${Number(tokenId)} - No URI found`);
           }
 
           return {
@@ -332,17 +385,35 @@ export default function DashboardPage() {
                   {nfts.map((nft) => {
                     // Convert IPFS URL to HTTP gateway if needed
                     const getImageUrl = (imageUrl: string | undefined) => {
-                      if (!imageUrl) return null;
-                      if (imageUrl.startsWith('ipfs://')) {
-                        return imageUrl.replace('ipfs://', 'https://ipfs.io/ipfs/');
+                      if (!imageUrl) {
+                        console.log(`NFT #${nft.tokenId} - No image URL found`);
+                        return null;
                       }
+                      console.log(`NFT #${nft.tokenId} - Original image URL:`, imageUrl);
+                      
+                      // Handle IPFS
+                      if (imageUrl.startsWith('ipfs://')) {
+                        const hash = imageUrl.replace('ipfs://', '');
+                        // Try multiple IPFS gateways for reliability
+                        const converted = `https://gateway.pinata.cloud/ipfs/${hash}`;
+                        console.log(`NFT #${nft.tokenId} - Converted to:`, converted);
+                        return converted;
+                      }
+                      
+                      // Handle Wikia/Fandom images (they often block direct access)
+                      if (imageUrl.includes('wikia.nocookie.net') || imageUrl.includes('fandom.com')) {
+                        console.log(`NFT #${nft.tokenId} - Wikia image detected, may not load due to CORS`);
+                      }
+                      
                       return imageUrl;
                     };
 
                     // Try multiple possible image field names
-                    const imageUrl = getImageUrl(nft.metadata?.image || nft.metadata?.imageURI || nft.metadata?.imageUrl);
+                    const rawImageUrl = nft.metadata?.image || nft.metadata?.imageURI || nft.metadata?.imageUrl || nft.metadata?.img;
+                    const imageUrl = getImageUrl(rawImageUrl);
                     
-                    console.log('NFT Metadata:', nft.metadata);
+                    console.log(`NFT #${nft.tokenId} - Final image URL:`, imageUrl);
+                    console.log(`NFT #${nft.tokenId} - Full metadata:`, nft.metadata);
 
                     return (
                       <div key={nft.tokenId} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
