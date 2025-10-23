@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useKYC } from '@/lib/hooks/useKYC';
+import { Header } from '@/components/Header';
 
 export default function KYCPage() {
   const { address, isConnected } = useAccount();
@@ -48,13 +49,16 @@ export default function KYCPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Vérification KYC</h1>
-            <p className="text-gray-600">
-              Veuillez connecter votre portefeuille pour soumettre une demande KYC.
-            </p>
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-lg shadow-xl p-8 text-center">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Vérification KYC</h1>
+              <p className="text-gray-600">
+                Veuillez connecter votre portefeuille pour soumettre une demande KYC.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -62,10 +66,12 @@ export default function KYCPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Vérification KYC</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-lg shadow-xl p-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-6">Vérification KYC</h1>
           
           {/* Current Status */}
           <div className="mb-8 p-6 bg-gray-50 rounded-lg">
@@ -200,6 +206,7 @@ export default function KYCPage() {
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

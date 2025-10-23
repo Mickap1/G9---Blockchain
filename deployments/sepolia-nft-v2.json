@@ -1,0 +1,22 @@
+{
+  "network": "sepolia",
+  "timestamp": "2025-10-23T13:04:25.168Z",
+  "contracts": {
+    "NFTAssetTokenV2": {
+      "address": "0xf16b0641A9C56C6db30E052E90DB9358b6D2C946",
+      "name": "RWA Asset Collection V2",
+      "symbol": "RWAV2",
+      "assetType": "Mixed Assets",
+      "kycRegistry": "0x563E31793214F193EB7993a2bfAd2957a70C7D65"
+    }
+  },
+  "deployer": "0x41B6b59a9365a58B00a68c597c49dB5Fa8C72116",
+  "gasOptimized": true,
+  "changes": [
+    "Removed name storage (now only in IPFS)",
+    "Removed valuation storage (now only in IPFS)",
+    "Removed certificateURI storage (now only in IPFS)",
+    "Only stores: tokenizationDate, isActive",
+    "Estimated gas reduction: 40-50%"
+  ]
+}

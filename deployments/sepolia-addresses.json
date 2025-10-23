@@ -8,5 +8,8 @@
   "deployedAt": "2025-10-23T10:42:37.771Z",
   "verified": true,
   "dex": "0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4",
-  "oracle": "0x602571F05745181fF237b81dAb8F67148e9475C7"
+  "oracle": "0x602571F05745181fF237b81dAb8F67148e9475C7",
+  "fungibleToken": "0xfA451d9C32d15a637Ab376732303c36C34C9979f",
+  "nftToken": "0x509cE5f4875904F34Bb7e722Cd153d6fC99f307d",
+  "lastUpdated": "2025-10-23T12:24:00.669Z"
 }
