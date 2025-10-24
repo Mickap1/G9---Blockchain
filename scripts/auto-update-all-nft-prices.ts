@@ -198,7 +198,7 @@ async function main() {
   const oracleAddress = addresses.oracle;
   
   // Utiliser NFTAssetTokenV2 (la bonne adresse)
-  const nftAddress = "0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36EFc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946"; // NFTAssetTokenV2
+  const nftAddress = "0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E"; // NFTAssetTokenV2
   
   if (!oracleAddress) {
     console.log("❌ Oracle non déployé!");
