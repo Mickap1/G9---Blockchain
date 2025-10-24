@@ -6,6 +6,7 @@ import { parseEther, formatEther } from 'viem';
 import { Header } from '@/components/Header';
 import SimpleDEXABI from '@/lib/abis/SimpleDEX.json';
 import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
+import { useIndexerSwaps, useIndexerHealth } from '@/lib/hooks/useIndexer';
 
 const DEX_ADDRESS = '0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98' as `0x${string}`;
 const TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f' as `0x${string}`;
@@ -14,6 +15,10 @@ export default function DEXPage() {
   const { address, isConnected } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  // Indexer data
+  const { swaps: indexedSwaps, loading: swapsLoading } = useIndexerSwaps(20, 0);
+  const { isHealthy: indexerHealthy } = useIndexerHealth();
 
   // État des réserves du pool
   const [reserveToken, setReserveToken] = useState<string>('0');
@@ -779,6 +784,114 @@ export default function DEXPage() {
               <li>• <strong>KYC requis</strong> : Vous devez être whitelisté pour trader</li>
             </ul>
           </div>
+
+          {/* Historique des swaps (depuis l'indexeur) */}
+          {indexerHealthy && (
+            <div className="mt-8 bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  📊 Historique des Swaps (Temps Réel)
+                </h3>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 rounded-full border border-green-500/30">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-300">Indexer actif</span>
+                </div>
+              </div>
+
+              {swapsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+                  <p className="text-gray-400 mt-4">Chargement des swaps...</p>
+                </div>
+              ) : indexedSwaps.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  Aucun swap enregistré pour le moment
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-white/10">
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Type
+                        </th>
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Utilisateur
+                        </th>
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Montant In
+                        </th>
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Montant Out
+                        </th>
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Date
+                        </th>
+                        <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider py-3 px-4">
+                          Transaction
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {indexedSwaps.map((swap, index) => (
+                        <tr key={index} className="hover:bg-white/5 transition">
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              swap.swapType === 'buy'
+                                ? 'bg-green-500/20 text-green-300'
+                                : 'bg-red-500/20 text-red-300'
+                            }`}>
+                              {swap.swapType === 'buy' ? '🔼 Achat' : '🔽 Vente'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 font-mono text-sm text-gray-300">
+                            {swap.user.slice(0, 6)}...{swap.user.slice(-4)}
+                          </td>
+                          <td className="py-3 px-4 text-white">
+                            {parseFloat(formatEther(BigInt(swap.amountIn))).toFixed(4)}
+                            <span className="text-xs text-gray-400 ml-1">
+                              {swap.swapType === 'buy' ? 'ETH' : 'RWAT'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-white">
+                            {parseFloat(formatEther(BigInt(swap.amountOut))).toFixed(4)}
+                            <span className="text-xs text-gray-400 ml-1">
+                              {swap.swapType === 'buy' ? 'RWAT' : 'ETH'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-gray-400">
+                            {new Date(swap.timestamp).toLocaleString('fr-FR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </td>
+                          <td className="py-3 px-4">
+                            <a
+                              href={`https://sepolia.etherscan.io/tx/${swap.transactionHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-orange-400 hover:text-orange-300 text-sm underline"
+                            >
+                              Voir ↗
+                            </a>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <p className="text-xs text-gray-400 text-center">
+                  💡 Cette liste se met à jour automatiquement toutes les 60 secondes via l'indexeur blockchain.
+                  Les swaps effectués en dehors de cette interface apparaissent également ici.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

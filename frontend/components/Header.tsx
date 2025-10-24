@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Wallet, Home, FileText, Coins, Zap, LayoutDashboard, Store, ArrowLeftRight, Database } from 'lucide-react';
+import { Wallet, Home, FileText, Coins, Zap, LayoutDashboard, Store, ArrowLeftRight, Database, Activity } from 'lucide-react';
+import { useIndexerHealth } from '@/lib/hooks/useIndexer';
 
 export function Header() {
+  const { isHealthy, loading } = useIndexerHealth();
   return (
     <header className="border-b border-white/10 bg-slate-900/95 backdrop-blur-md shadow-lg">
       <div className="container mx-auto px-4">
@@ -50,6 +52,14 @@ export function Header() {
               <span>Create NFT</span>
             </Link>
           </nav>
+
+          {/* Indexer Status */}
+          <div className="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
+            <Activity className={`w-4 h-4 ${loading ? 'text-yellow-400 animate-pulse' : isHealthy ? 'text-green-400' : 'text-red-400'}`} />
+            <span className="text-xs text-gray-300">
+              {loading ? 'Checking...' : isHealthy ? 'Indexer Live' : 'Direct Mode'}
+            </span>
+          </div>
 
           {/* Connect Wallet Button */}
           <ConnectButton />

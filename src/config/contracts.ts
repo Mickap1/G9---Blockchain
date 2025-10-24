@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
 
-// Adresses des contrats déployés sur Sepolia
+// Adresses des contrats déployés sur Sepolia (MISES À JOUR)
 export const CONTRACTS = {
-  dex: "0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4",
-  fungibleToken: "0x6B2a38Ef30420B0AF041F014a092BEDB39F2Eb81",
-  nftToken: "0xcC1fA977E3c47D3758117De61218208c1282362c",
+  dex: "0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98",
+  fungibleToken: "0xfA451d9C32d15a637Ab376732303c36C34C9979f",
+  nftToken: "0x509cE5f4875904F34Bb7e722Cd153d6fC99f307d",
   oracle: "0x602571F05745181fF237b81dAb8F67148e9475C7",
-  kycRegistry: "0x8E4312166Ed927C331B5950e5B8ac636841f06Eb",
+  kycRegistry: "0x563E31793214F193EB7993a2bfAd2957a70C7D65",
 };
 
 // ABIs simplifiés - uniquement les events nécessaires
