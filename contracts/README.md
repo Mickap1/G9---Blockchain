@@ -39,7 +39,7 @@ Ce dossier contient tous les smart contracts de la plateforme de tokenisation d'
 ---
 
 ### 💎 NFTAssetTokenV2.sol (Version Optimisée)
-**Adresse :** [`0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946`](https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946)  
+**Adresse :** [`0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E`](https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E)  
 **Symbole :** RWAV2 (RWA Asset Collection V2)  
 **Rôle :** Token ERC-721 pour la tokenisation d'actifs uniques (version gas-optimisée)
 
@@ -138,7 +138,7 @@ Tous les contrats sont déployés et vérifiés sur **Sepolia Testnet** :
 |---------|---------|-----------|
 | **KYCRegistry** | `0x563E31...7C7D65` | [🔍 Voir](https://sepolia.etherscan.io/address/0x563E31793214F193EB7993a2bfAd2957a70C7D65) |
 | **RWAT Token** | `0xfA451d...C9979f` | [🔍 Voir](https://sepolia.etherscan.io/address/0xfA451d9C32d15a637Ab376732303c36C34C9979f) |
-| **NFT V2** | `0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E6...2C946` | [🔍 Voir](https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946) |
+| **NFT V2** | `0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E6...2C946` | [🔍 Voir](https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E) |
 | **SimpleDEX** | `0x2Cf848...3fAa98` | [🔍 Voir](https://sepolia.etherscan.io/address/0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98) |
 | **Oracle** | `0x602571...9475C7` | [🔍 Voir](https://sepolia.etherscan.io/address/0x602571F05745181fF237b81dAb8F67148e9475C7) |
 | **Marketplace** | `0x9F057E...8013dd` | [🔍 Voir](https://sepolia.etherscan.io/address/0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd) |

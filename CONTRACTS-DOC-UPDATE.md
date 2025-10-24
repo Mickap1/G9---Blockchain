@@ -102,7 +102,7 @@ Depuis le README principal, on peut maintenant :
 |---|---------|---------|--------|
 | 1 | KYCRegistry | `0x563E31793214F193EB7993a2bfAd2957a70C7D65` | ✅ Documenté |
 | 2 | FungibleAssetToken | `0xfA451d9C32d15a637Ab376732303c36C34C9979f` | ✅ Documenté |
-| 3 | NFTAssetTokenV2 | `0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946` | ✅ Documenté |
+| 3 | NFTAssetTokenV2 | `0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E` | ✅ Documenté |
 | 4 | SimpleDEX | `0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98` | ✅ Documenté |
 | 5 | SimplePriceOracle | `0x602571F05745181fF237b81dAb8F67148e9475C7` | ✅ Documenté |
 | 6 | Marketplace | `0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd` | ✅ Documenté |
@@ -122,7 +122,7 @@ Tous les liens pointent vers **Sepolia Testnet** :
    https://sepolia.etherscan.io/address/0xfA451d9C32d15a637Ab376732303c36C34C9979f
 
 3. **NFTAssetTokenV2 (RWAV2)**  
-   https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946
+   https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E
 
 4. **SimpleDEX**  
    https://sepolia.etherscan.io/address/0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98

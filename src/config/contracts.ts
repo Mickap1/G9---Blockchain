@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 export const CONTRACTS = {
   dex: "0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98",
   fungibleToken: "0xfA451d9C32d15a637Ab376732303c36C34C9979f",
-  nftToken: "0x509cE5f4875904F34Bb7e722Cd153d6fC99f307d",
+  nftToken: "0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E", // NFTAssetTokenV2 (mis à jour)
   oracle: "0x602571F05745181fF237b81dAb8F67148e9475C7",
   kycRegistry: "0x563E31793214F193EB7993a2bfAd2957a70C7D65",
 };

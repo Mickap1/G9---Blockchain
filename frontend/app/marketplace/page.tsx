@@ -9,11 +9,11 @@ import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
 import MarketplaceABI from '@/lib/abis/Marketplace.json';
 import Image from 'next/image';
 
-const NFT_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946' as `0x${string}`;
+const NFT_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E' as `0x${string}`;
 const TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f' as `0x${string}`;
 const MARKETPLACE_ADDRESS = '0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd' as `0x${string}`;
 
-interface NFTListing {
+interface Listing {
   listingId: number;
   tokenId: number;
   owner: string;
@@ -39,7 +39,7 @@ export default function MarketplacePage() {
   const { data: walletClient } = useWalletClient();
 
   const [activeTab, setActiveTab] = useState<'nft' | 'tokens'>('nft');
-  const [nftListings, setNftListings] = useState<NFTListing[]>([]);
+  const [nftListings, setNftListings] = useState<Listing[]>([]);
   const [tokenListings, setTokenListings] = useState<TokenListing[]>([]);
   const [myNFTs, setMyNFTs] = useState<any[]>([]);
   const [myTokenBalance, setMyTokenBalance] = useState('0');
@@ -82,7 +82,7 @@ export default function MarketplacePage() {
 
       console.log(`   Total listings created: ${nextListingId.toString()}`);
 
-      const listings: NFTListing[] = [];
+      const listings: Listing[] = [];
       
       // Parcourir tous les listings
       for (let listingId = 1; listingId <= Number(nextListingId); listingId++) {
@@ -100,6 +100,12 @@ export default function MarketplacePage() {
           // Ne garder que les listings actifs
           if (!listing.active) {
             console.log(`   ⏩ Listing ${listingId} is not active, skipping`);
+            continue;
+          }
+
+          // FILTRE IMPORTANT: Ne garder que les NFT de notre contrat
+          if (listing.nftContract.toLowerCase() !== NFT_ADDRESS.toLowerCase()) {
+            console.log(`   ⏩ Listing ${listingId} is from another NFT contract (${listing.nftContract}), skipping`);
             continue;
           }
 
@@ -297,7 +303,7 @@ export default function MarketplacePage() {
 
   // Acheter un NFT
   // Acheter un NFT
-  const handleBuyNFT = async (listing: NFTListing) => {
+  const handleBuyNFT = async (listing: Listing) => {
     if (!walletClient || !address) {
       alert('Veuillez connecter votre wallet');
       return;
