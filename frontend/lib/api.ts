@@ -10,25 +10,30 @@ const api = axios.create({
 });
 
 export interface Swap {
-  transactionHash: string;
+  _id?: string;
+  type: 'buy' | 'sell';
+  buyer?: string;
+  seller?: string;
+  ethIn?: string;
+  tokensOut?: string;
+  tokensIn?: string;
+  ethOut?: string;
+  timestamp: number;
   blockNumber: number;
-  timestamp: Date;
-  user: string;
-  tokenIn: string;
-  tokenOut: string;
-  amountIn: string;
-  amountOut: string;
-  swapType: 'buy' | 'sell';
+  transactionHash: string;
+  createdAt?: string;
 }
 
 export interface TokenTransfer {
+  _id?: string;
   transactionHash: string;
   blockNumber: number;
-  timestamp: Date;
+  timestamp: number;
   from: string;
   to: string;
-  tokenAddress: string;
+  tokenAddress?: string;
   amount: string;
+  createdAt?: string;
 }
 
 export interface NFT {

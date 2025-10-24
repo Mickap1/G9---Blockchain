@@ -8,6 +8,7 @@ import NFTTokenV2ABI from '@/lib/abis/NFTAssetTokenV2.json';
 import SimpleDEXABI from '@/lib/abis/SimpleDEX.json';
 import SimplePriceOracleABI from '@/lib/abis/SimplePriceOracle.json';
 import { Header } from '@/components/Header';
+import { RecentActivity } from '@/components/RecentActivity';
 
 const FUNGIBLE_TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f';
 const NFT_TOKEN_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946';
@@ -630,6 +631,11 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* 📊 ACTIVITÉ BLOCKCHAIN EN TEMPS RÉEL */}
+            <div className="my-8">
+              <RecentActivity maxItems={15} showTitle={true} compact={false} />
+            </div>
 
             {/* 🎨 MA GALERIE DE NFTs */}
             <div className="bg-gradient-to-br from-purple-900/40 via-pink-900/30 to-purple-800/40 backdrop-blur-md rounded-xl p-8 border border-purple-500/20">

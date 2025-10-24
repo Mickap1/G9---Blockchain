@@ -81,13 +81,27 @@ Le système comprend :
 - ✅ Liquidité initiale fournie par le déployeur
 - ✅ Scripts : `deploy-dex.ts`, `setup-dex-liquidity.ts`, `trade-tokens.ts`, `buy-with-account2.ts`
 
-### ⏳ 4. Indexer en Temps Réel (À faire)
+### ✅ 4. Indexer en Temps Réel (Complète)
 **Synchronisation Blockchain → Frontend :**
-- ⏳ Backend d'écoute des événements on-chain
-- ⏳ Indexation périodique (1 min) des swaps DEX
-- ⏳ Base de données pour état synchronisé
-- ⏳ API REST pour le frontend
-- ⏳ Détection des transactions externes (hors UI)
+- ✅ Backend indexeur déployé sur Railway (Node.js + Express)
+- ✅ Monitoring automatique toutes les 60 secondes
+- ✅ Indexation de TOUS les événements : Swaps, Transfers, NFTs, Oracle
+- ✅ Stockage MongoDB Atlas (cloud)
+- ✅ API REST exposée : `https://g9-blockchain-production-836a.up.railway.app`
+- ✅ Frontend intégré avec hooks React (`useIndexer.ts`)
+- ✅ Affichage temps réel dans Dashboard et DEX
+- ✅ **Détection des transactions externes** (hors UI) ✨
+- ✅ Test automatisé : `test-indexer-requirement.ts`
+- ✅ Documentation : `PROOF-REQUIREMENT-4.md`, `docs/INDEXER-INTEGRATION.md`
+
+**Preuves de conformité :**
+```bash
+# Tester l'indexeur en production
+curl https://g9-blockchain-production-836a.up.railway.app/api/health
+
+# Lancer le test automatisé (swap externe visible)
+npx hardhat run scripts/test-indexer-requirement.ts --network sepolia
+```
 
 ### ✅ 5. Oracle (Complète)
 **Oracle de Prix On-Chain :**
@@ -106,6 +120,21 @@ Le système comprend :
 - 💱 **[Guide DEX](./docs/DEX-DEPLOYMENT-GUIDE.md)** - Configuration du DEX
 - 📊 **[Guide Oracle](./docs/ORACLE-GUIDE.md)** - Configuration de l'Oracle
 - 🛠️ **[Scripts](./scripts/README.md)** - Documentation des scripts
+
+### Smart Contracts
+
+- 📜 **[Documentation Contrats](./contracts/README.md)** - Vue d'ensemble des contrats
+- 🔗 **[Adresses Déployées](./CONTRACTS-ADDRESSES.md)** - Toutes les adresses avec liens Etherscan
+
+**Contrats déployés sur Sepolia :**
+| Contrat | Adresse | Etherscan |
+|---------|---------|-----------|
+| KYCRegistry | `0x563E31...7C7D65` | [🔍 Voir](https://sepolia.etherscan.io/address/0x563E31793214F193EB7993a2bfAd2957a70C7D65) |
+| RWAT Token | `0xfA451d...C9979f` | [🔍 Voir](https://sepolia.etherscan.io/address/0xfA451d9C32d15a637Ab376732303c36C34C9979f) |
+| NFT V2 | `0xf16b06...2C946` | [🔍 Voir](https://sepolia.etherscan.io/address/0xf16b0641A9C56C6db30E052E90DB9358b6D2C946) |
+| SimpleDEX | `0x2Cf848...3fAa98` | [🔍 Voir](https://sepolia.etherscan.io/address/0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98) |
+| Oracle | `0x602571...9475C7` | [🔍 Voir](https://sepolia.etherscan.io/address/0x602571F05745181fF237b81dAb8F67148e9475C7) |
+| Marketplace | `0x9F057E...8013dd` | [🔍 Voir](https://sepolia.etherscan.io/address/0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd) |
 
 ### API des Contrats
 

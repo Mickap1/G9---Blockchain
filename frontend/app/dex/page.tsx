@@ -833,34 +833,39 @@ export default function DEXPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                      {indexedSwaps.map((swap, index) => (
+                      {indexedSwaps.map((swap, index) => {
+                        const user = swap.type === 'buy' ? swap.buyer : swap.seller;
+                        const amountIn = swap.type === 'buy' ? swap.ethIn : swap.tokensIn;
+                        const amountOut = swap.type === 'buy' ? swap.tokensOut : swap.ethOut;
+                        
+                        return (
                         <tr key={index} className="hover:bg-white/5 transition">
                           <td className="py-3 px-4">
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              swap.swapType === 'buy'
+                              swap.type === 'buy'
                                 ? 'bg-green-500/20 text-green-300'
                                 : 'bg-red-500/20 text-red-300'
                             }`}>
-                              {swap.swapType === 'buy' ? '🔼 Achat' : '🔽 Vente'}
+                              {swap.type === 'buy' ? '🔼 Achat' : '🔽 Vente'}
                             </span>
                           </td>
                           <td className="py-3 px-4 font-mono text-sm text-gray-300">
-                            {swap.user.slice(0, 6)}...{swap.user.slice(-4)}
+                            {user?.slice(0, 6)}...{user?.slice(-4)}
                           </td>
                           <td className="py-3 px-4 text-white">
-                            {parseFloat(formatEther(BigInt(swap.amountIn))).toFixed(4)}
+                            {amountIn && parseFloat(formatEther(BigInt(amountIn))).toFixed(4)}
                             <span className="text-xs text-gray-400 ml-1">
-                              {swap.swapType === 'buy' ? 'ETH' : 'RWAT'}
+                              {swap.type === 'buy' ? 'ETH' : 'RWAT'}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-white">
-                            {parseFloat(formatEther(BigInt(swap.amountOut))).toFixed(4)}
+                            {amountOut && parseFloat(formatEther(BigInt(amountOut))).toFixed(4)}
                             <span className="text-xs text-gray-400 ml-1">
-                              {swap.swapType === 'buy' ? 'RWAT' : 'ETH'}
+                              {swap.type === 'buy' ? 'RWAT' : 'ETH'}
                             </span>
                           </td>
                           <td className="py-3 px-4 text-sm text-gray-400">
-                            {new Date(swap.timestamp).toLocaleString('fr-FR', {
+                            {new Date(typeof swap.timestamp === 'number' ? swap.timestamp * 1000 : swap.timestamp).toLocaleString('fr-FR', {
                               day: '2-digit',
                               month: '2-digit',
                               hour: '2-digit',
@@ -878,7 +883,8 @@ export default function DEXPage() {
                             </a>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

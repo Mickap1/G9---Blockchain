@@ -1,238 +1,474 @@
-# Scripts de Déploiement et Utilitaires
+# 📜 Scripts de Déploiement et Utilitaires# Scripts de Déploiement et Utilitaires
 
-Ce dossier contient tous les scripts pour déployer et gérer les contrats blockchain du projet.
 
----
 
-## 📋 Scripts de Déploiement
+Ce dossier contient tous les scripts essentiels pour déployer et gérer les contrats blockchain du projet.Ce dossier contient tous les scripts pour déployer et gérer les contrats blockchain du projet.
 
-### Déploiement de Contrats Individuels
+
+
+------
+
+
+
+## 🚀 Scripts de Déploiement## 📋 Scripts de Déploiement
+
+
+
+### `deploy-all.ts` - Déploiement Complet### Déploiement de Contrats Individuels
+
+Déploie tous les contrats dans le bon ordre avec vérification des dépendances.
 
 #### `deploy-kyc.ts` - Déployer le KYCRegistry
-Déploie le contrat de gestion KYC (indépendant, aucune dépendance).
 
-```bash
+```bashDéploie le contrat de gestion KYC (indépendant, aucune dépendance).
+
+npx hardhat run scripts/deploy-all.ts --network sepolia
+
+``````bash
+
 npx hardhat run scripts/deploy-kyc.ts --network sepolia
-```
 
-#### `deploy-fungible.ts` - Déployer le Token Fongible (ERC-20)
-Déploie le contrat de token fongible pour la fractionnalisation d'actifs.
+**Ordre de déploiement :**```
 
-```bash
+1. KYCRegistry
+
+2. FungibleAssetToken#### `deploy-fungible.ts` - Déployer le Token Fongible (ERC-20)
+
+3. NFTAssetTokenDéploie le contrat de token fongible pour la fractionnalisation d'actifs.
+
+4. SimplePriceOracle
+
+5. SimpleDEX```bash
+
 npx hardhat run scripts/deploy-fungible.ts --network sepolia
-```
 
-#### `deploy-nft.ts` - Déployer le Token NFT (ERC-721)
-Déploie le contrat NFT pour la tokenisation d'actifs uniques (diamants).
+### Scripts de Déploiement Individuels```
 
-```bash
+
+
+#### `deploy-kyc.ts` - KYCRegistry#### `deploy-nft.ts` - Déployer le Token NFT (ERC-721)
+
+```bashDéploie le contrat NFT pour la tokenisation d'actifs uniques (diamants).
+
+npx hardhat run scripts/deploy-kyc.ts --network sepolia
+
+``````bash
+
 npx hardhat run scripts/deploy-nft.ts --network sepolia
-```
 
-#### `deploy-dex.ts` - Déployer le DEX
-Déploie le contrat d'échange décentralisé (DEX) avec pool de liquidité.
+#### `deploy-fungible.ts` - Token Fongible ERC-20```
 
 ```bash
-npx hardhat run scripts/deploy-dex.ts --network sepolia
+
+npx hardhat run scripts/deploy-fungible.ts --network sepolia#### `deploy-dex.ts` - Déployer le DEX
+
+```Déploie le contrat d'échange décentralisé (DEX) avec pool de liquidité.
+
+
+
+#### `deploy-nft.ts` - Token NFT ERC-721```bash
+
+```bashnpx hardhat run scripts/deploy-dex.ts --network sepolia
+
+npx hardhat run scripts/deploy-nft.ts --network sepolia```
+
 ```
 
 #### `deploy-oracle.ts` - Déployer l'Oracle de Prix
-Déploie le contrat Oracle pour la gestion automatique des prix des NFTs.
+
+#### `deploy-oracle.ts` - Oracle de PrixDéploie le contrat Oracle pour la gestion automatique des prix des NFTs.
 
 ```bash
-npx hardhat run scripts/deploy-oracle.ts --network sepolia
+
+npx hardhat run scripts/deploy-oracle.ts --network sepolia```bash
+
+```npx hardhat run scripts/deploy-oracle.ts --network sepolia
+
 ```
 
-#### `deploy-all.ts` - Déployer Tous les Contrats
-Déploie tous les contrats dans le bon ordre (KYC → Fungible → NFT).
+#### `deploy-dex.ts` - DEX AMM
+
+```bash#### `deploy-all.ts` - Déployer Tous les Contrats
+
+npx hardhat run scripts/deploy-dex.ts --network sepoliaDéploie tous les contrats dans le bon ordre (KYC → Fungible → NFT).
+
+```
 
 ```bash
-npx hardhat run scripts/deploy-all.ts --network sepolia
+
+---npx hardhat run scripts/deploy-all.ts --network sepolia
+
 ```
+
+## ⚙️ Scripts de Configuration
 
 ---
 
-## 🛠️ Scripts Utilitaires
+### `setup-dex-liquidity.ts` - Initialiser la Liquidité DEX
 
-### Gestion du KYC
+Ajoute la liquidité initiale au pool DEX (tokens + ETH).## 🛠️ Scripts Utilitaires
 
-#### `check-kyc.ts` - Vérifier et Corriger la Configuration KYC
+
+
+```bash### Gestion du KYC
+
+npx hardhat run scripts/setup-dex-liquidity.ts --network sepolia
+
+```#### `check-kyc.ts` - Vérifier et Corriger la Configuration KYC
+
 Diagnostique les problèmes de KYC et whitelist automatiquement le deployer si nécessaire.
 
-```bash
-npx hardhat run scripts/check-kyc.ts --network sepolia
-```
+### `whitelist-account.ts` - Whitelister un Compte
 
-#### `whitelist-account.ts` - Whitelist une Adresse
+Whitelist une adresse pour le trading (requis par KYC).```bash
+
+npx hardhat run scripts/check-kyc.ts --network sepolia
+
+```bash```
+
+npx hardhat run scripts/whitelist-account.ts --network sepolia
+
+```#### `whitelist-account.ts` - Whitelist une Adresse
+
 Ajoute une adresse à la whitelist KYC pour autoriser les transactions.
 
-```bash
+### `grant-admin-role.ts` - Donner le Rôle Admin
+
+Accorde le rôle admin à une adresse pour gérer les contrats.```bash
+
 npx hardhat run scripts/whitelist-account.ts --network sepolia
-```
 
-### Gestion des NFTs
+```bash```
 
-#### `mint-diamond.ts` - Minter un NFT Diamond
+npx hardhat run scripts/grant-admin-role.ts --network sepolia
+
+```### Gestion des NFTs
+
+
+
+---#### `mint-diamond.ts` - Minter un NFT Diamond
+
 Crée un NFT de diamant certifié GIA avec une valuation initiale.
 
+## 🧪 Scripts de Test et Vérification
+
 ```bash
-npx hardhat run scripts/mint-diamond.ts --network sepolia
-```
 
-### Gestion de l'Oracle et des Prix
+### `test-indexer-requirement.ts` - Test de l'Exigence #4 ⭐npx hardhat run scripts/mint-diamond.ts --network sepolia
 
-#### `check-prices.ts` - Consulter les Prix des NFTs
+**Script IMPORTANT** qui prouve que l'exigence #4 est respectée.```
+
+
+
+```bash### Gestion de l'Oracle et des Prix
+
+npx hardhat run scripts/test-indexer-requirement.ts --network sepolia
+
+```#### `check-prices.ts` - Consulter les Prix des NFTs
+
 Affiche les prix actuels et l'historique des prix stockés dans l'Oracle.
 
-```bash
-npx hardhat run scripts/check-prices.ts --network sepolia
-```
+**Ce qu'il fait :**
+
+1. Fait un swap directement sur le smart contract (hors UI)```bash
+
+2. Attend que l'indexeur le détecte (max 2 minutes)npx hardhat run scripts/check-prices.ts --network sepolia
+
+3. Vérifie que le swap apparaît dans l'API indexeur```
+
+4. ✅ Prouve que les transactions externes sont visibles
 
 #### `auto-update-diamond-price.ts` - Mise à Jour Automatique des Prix
-Script en boucle infinie qui met à jour le prix du Diamond toutes les heures (ou 2 minutes en mode test).
 
-```bash
-# Mode test (2 minutes)
+**Documentation :** Voir `docs/TEST-INDEXER-GUIDE.md`Script en boucle infinie qui met à jour le prix du Diamond toutes les heures (ou 2 minutes en mode test).
+
+
+
+### `verify-system.ts` - Vérification Complète du Système```bash
+
+Vérifie que tous les contrats sont déployés et fonctionnels.# Mode test (2 minutes)
+
 npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia
 
-# Pour production: éditer le fichier et décommenter UPDATE_INTERVAL = 60 * 60 * 1000
-```
+```bash
 
-**Fonctionnement:**
-- Génère un multiplicateur aléatoire entre 0.8 et 1.2 (-20% à +20%)
-- Met à jour le prix dans l'Oracle ET dans le contrat NFT
-- Tourne en continu avec un intervalle configurable
+npx hardhat run scripts/verify-system.ts --network sepolia# Pour production: éditer le fichier et décommenter UPDATE_INTERVAL = 60 * 60 * 1000
 
-### Gestion du DEX
+``````
 
-#### `setup-dex-liquidity.ts` - Ajouter de la Liquidité au DEX
+
+
+**Vérifie :****Fonctionnement:**
+
+- Déploiement des contrats- Génère un multiplicateur aléatoire entre 0.8 et 1.2 (-20% à +20%)
+
+- Connexions entre contrats- Met à jour le prix dans l'Oracle ET dans le contrat NFT
+
+- Rôles et permissions- Tourne en continu avec un intervalle configurable
+
+- Liquidité DEX
+
+- État KYC### Gestion du DEX
+
+
+
+---#### `setup-dex-liquidity.ts` - Ajouter de la Liquidité au DEX
+
 Ajoute de la liquidité (tokens + ETH) au pool du DEX.
 
-```bash
-npx hardhat run scripts/setup-dex-liquidity.ts --network sepolia
-```
-
-#### `buy-with-account2.ts` - Acheter des Tokens (Account 2)
-Achète des tokens depuis le DEX en utilisant le compte 2 (PRIVATE_KEY_2).
+## 🔍 Scripts de Vérification Rapide
 
 ```bash
-npx hardhat run scripts/buy-with-account2.ts --network sepolia
+
+### `check-kyc.ts` - Vérifier le Statut KYCnpx hardhat run scripts/setup-dex-liquidity.ts --network sepolia
+
+Vérifie si une adresse est whitelistée/blacklistée.```
+
+
+
+```bash#### `buy-with-account2.ts` - Acheter des Tokens (Account 2)
+
+npx hardhat run scripts/check-kyc.ts --network sepoliaAchète des tokens depuis le DEX en utilisant le compte 2 (PRIVATE_KEY_2).
+
 ```
 
-#### `trade-tokens.ts` - Trading Complet (2 Comptes)
-Script complet de trading:
-1. Account 1 vend des tokens au DEX
+```bash
+
+### `check-prices.ts` - Vérifier les Prix Oraclenpx hardhat run scripts/buy-with-account2.ts --network sepolia
+
+Affiche les prix actuels des assets depuis l'Oracle.```
+
+
+
+```bash#### `trade-tokens.ts` - Trading Complet (2 Comptes)
+
+npx hardhat run scripts/check-prices.ts --network sepoliaScript complet de trading:
+
+```1. Account 1 vend des tokens au DEX
+
 2. Account 2 achète des tokens du DEX
-
-```bash
-npx hardhat run scripts/trade-tokens.ts --network sepolia
-```
-
-### Monitoring
-
-#### `check-accounts-status.ts` - Vérifier les Soldes et KYC
-Affiche les soldes ETH, tokens, et statut KYC de plusieurs comptes.
-
-```bash
-npx hardhat run scripts/check-accounts-status.ts --network sepolia
-```
-
-#### `check-sepolia-balance.ts` - Vérifier le Solde Sepolia
-Vérifie le solde ETH du deployer et la connexion au réseau.
-
-```bash
-npx hardhat run scripts/check-sepolia-balance.ts --network sepolia
-```
-
-#### `verify-system.ts` - Vérifier Tout le Système
-Vérifie que tous les contrats sont déployés et fonctionnels.
-
-```bash
-npx hardhat run scripts/verify-system.ts --network sepolia
-```
 
 ---
 
-## 🧪 Tests Unitaires
+```bash
 
-Les tests se trouvent dans le dossier `test/`:
+## 🛠️ Utilitairesnpx hardhat run scripts/trade-tokens.ts --network sepolia
+
+```
+
+### `mint-diamond.ts` - Créer un NFT Diamant
+
+Exemple de création d'un NFT avec métadonnées IPFS.### Monitoring
+
+
+
+```bash#### `check-accounts-status.ts` - Vérifier les Soldes et KYC
+
+npx hardhat run scripts/mint-diamond.ts --network sepoliaAffiche les soldes ETH, tokens, et statut KYC de plusieurs comptes.
+
+```
+
+```bash
+
+### `list-admins.ts` - Lister les Adminsnpx hardhat run scripts/check-accounts-status.ts --network sepolia
+
+Liste tous les admins des contrats.```
+
+
+
+```bash#### `check-sepolia-balance.ts` - Vérifier le Solde Sepolia
+
+npx hardhat run scripts/list-admins.ts --network sepoliaVérifie le solde ETH du deployer et la connexion au réseau.
+
+```
+
+```bash
+
+### `auto-update-diamond-price.ts` - Mise à Jour Automatique Prixnpx hardhat run scripts/check-sepolia-balance.ts --network sepolia
+
+Script automatique pour mettre à jour les prix Oracle (à lancer via cron).```
+
+
+
+```bash#### `verify-system.ts` - Vérifier Tout le Système
+
+npx hardhat run scripts/auto-update-diamond-price.ts --network sepoliaVérifie que tous les contrats sont déployés et fonctionnels.
+
+```
+
+```bash
+
+### `extract-abis.js` - Extraire les ABIsnpx hardhat run scripts/verify-system.ts --network sepolia
+
+Extrait les ABIs des contrats pour le frontend.```
+
+
+
+```bash---
+
+node scripts/extract-abis.js
+
+```## 🧪 Tests Unitaires
+
+
+
+### `start-indexer.ps1` - Démarrer l'Indexeur Local (Windows)Les tests se trouvent dans le dossier `test/`:
+
+Démarre l'indexeur en local pour le développement.
 
 #### `FungibleAssetToken.test.ts`
-Tests complets du token ERC-20 fongible (minting, transferts, KYC, pause).
 
-#### `KYCRegistry.test.ts`
+```powershellTests complets du token ERC-20 fongible (minting, transferts, KYC, pause).
+
+.\scripts\start-indexer.ps1
+
+```#### `KYCRegistry.test.ts`
+
 Tests du système KYC (whitelist, révocation, rôles).
 
+---
+
 #### `NFTAssetToken.test.ts`
-Tests du token NFT ERC-721 (minting, transferts, valuation, métadonnées).
 
-#### `SimpleDEX.test.ts`
-Tests du DEX (liquidité, swaps, fees, sécurité).
+## 📊 Ordre d'Exécution RecommandéTests du token NFT ERC-721 (minting, transferts, valuation, métadonnées).
 
-**Lancer tous les tests:**
+
+
+### 1. Déploiement Initial#### `SimpleDEX.test.ts`
+
+```bashTests du DEX (liquidité, swaps, fees, sécurité).
+
+# Tout déployer d'un coup
+
+npx hardhat run scripts/deploy-all.ts --network sepolia**Lancer tous les tests:**
+
 ```bash
-npx hardhat test
+
+# Extraire les ABIs pour le frontendnpx hardhat test
+
+node scripts/extract-abis.js```
+
 ```
 
 **Lancer un test spécifique:**
-```bash
-npx hardhat test test/SimpleDEX.test.ts
-```
+
+### 2. Configuration```bash
+
+```bashnpx hardhat test test/SimpleDEX.test.ts
+
+# Whitelist votre compte```
+
+npx hardhat run scripts/whitelist-account.ts --network sepolia
 
 ---
 
-## 📁 Fichiers de Déploiement
+# Ajouter la liquidité initiale au DEX
+
+npx hardhat run scripts/setup-dex-liquidity.ts --network sepolia## 📁 Fichiers de Déploiement
+
+```
 
 Les scripts sauvegardent les adresses dans `deployments/`:
 
-- `sepolia-addresses.json` - Toutes les adresses déployées
-- `sepolia-kyc-registry.json` - KYCRegistry
-- `sepolia-fungible-token.json` - FungibleAssetToken
+### 3. Vérification
+
+```bash- `sepolia-addresses.json` - Toutes les adresses déployées
+
+# Vérifier que tout fonctionne- `sepolia-kyc-registry.json` - KYCRegistry
+
+npx hardhat run scripts/verify-system.ts --network sepolia- `sepolia-fungible-token.json` - FungibleAssetToken
+
 - `sepolia-nft-token.json` - NFTAssetToken
-- `sepolia-all-contracts.json` - Tous les contrats
 
-- `sepolia-addresses.json` - Toutes les adresses déployées
+# Tester l'indexeur (IMPORTANT pour l'évaluation)- `sepolia-all-contracts.json` - Tous les contrats
+
+npx hardhat run scripts/test-indexer-requirement.ts --network sepolia
+
+```- `sepolia-addresses.json` - Toutes les adresses déployées
+
 - `sepolia-kyc-registry.json` - KYCRegistry
-- `sepolia-fungible-token.json` - FungibleAssetToken
+
+---- `sepolia-fungible-token.json` - FungibleAssetToken
+
 - `sepolia-nft-token.json` - NFTAssetToken
-- `sepolia-all-contracts.json` - Tous les contrats
 
----
+## 🎯 Scripts Essentiels pour le Projet- `sepolia-all-contracts.json` - Tous les contrats
 
-## ⚡ Guide de Démarrage Rapide
 
-### 1. Déploiement Initial
-```bash
-# Déployer tous les contrats de base
-npx hardhat run scripts/deploy-all.ts --network sepolia
+
+| Script | Objectif | Priorité |---
+
+|--------|----------|----------|
+
+| `deploy-all.ts` | Déploiement complet | ⭐⭐⭐ |## ⚡ Guide de Démarrage Rapide
+
+| `test-indexer-requirement.ts` | Preuve exigence #4 | ⭐⭐⭐ |
+
+| `whitelist-account.ts` | Permettre le trading | ⭐⭐⭐ |### 1. Déploiement Initial
+
+| `setup-dex-liquidity.ts` | Initialiser DEX | ⭐⭐⭐ |```bash
+
+| `verify-system.ts` | Vérification complète | ⭐⭐ |# Déployer tous les contrats de base
+
+| `extract-abis.js` | Frontend | ⭐⭐ |npx hardhat run scripts/deploy-all.ts --network sepolia
+
+| `mint-diamond.ts` | Exemple NFT | ⭐ |
 
 # Déployer le DEX
-npx hardhat run scripts/deploy-dex.ts --network sepolia
 
-# Déployer l'Oracle
+---npx hardhat run scripts/deploy-dex.ts --network sepolia
+
+
+
+## 🧹 Nettoyage# Déployer l'Oracle
+
 npx hardhat run scripts/deploy-oracle.ts --network sepolia
-```
 
-### 2. Configuration
-```bash
-# Whitelist des utilisateurs
-npx hardhat run scripts/whitelist-account.ts --network sepolia
+Un script de nettoyage (`cleanup-scripts.ps1`) a été exécuté pour supprimer 37 fichiers inutiles (doublons, debug, scripts temporaires).```
 
-# Ajouter liquidité au DEX
+
+
+**Scripts supprimés :**### 2. Configuration
+
+- Anciennes versions (deploy-kyc-v2, deploy-nft-v2, etc.)```bash
+
+- Scripts de debug (debug-dex-liquidity, fix-dex-in-admin, etc.)# Whitelist des utilisateurs
+
+- Doublons de vérification (check-accounts-status, check-all-whitelisted, etc.)npx hardhat run scripts/whitelist-account.ts --network sepolia
+
+- Doublons d'actions (add-initial-liquidity, trade-tokens, etc.)
+
+- Scripts temporaires (calculate-roles, init-all-nft-prices, etc.)# Ajouter liquidité au DEX
+
 npx hardhat run scripts/setup-dex-liquidity.ts --network sepolia
-```
 
-### 3. Minting de NFTs
+---```
+
+
+
+## 📚 Documentation Complémentaire### 3. Minting de NFTs
+
 ```bash
-# Minter un Diamond NFT
-npx hardhat run scripts/mint-diamond.ts --network sepolia
-```
+
+- **Test Indexeur** : `docs/TEST-INDEXER-GUIDE.md`# Minter un Diamond NFT
+
+- **Intégration Indexeur** : `docs/INDEXER-INTEGRATION.md`npx hardhat run scripts/mint-diamond.ts --network sepolia
+
+- **Preuve Exigence #4** : `PROOF-REQUIREMENT-4.md````
+
+- **Conformité Complète** : `docs/REQUIREMENT-4-COMPLIANCE.md`
 
 ### 4. Lancer l'Oracle (Auto-Update)
-```bash
+
+---```bash
+
 # Mode test (updates toutes les 2 minutes)
-npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia
-```
+
+**Dernière mise à jour** : 24 octobre 2025  npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia
+
+**Scripts essentiels** : 20 (sur 51 originaux)  ```
+
+**Nettoyage effectué** : ✅ 37 fichiers supprimés
 
 ---
 
