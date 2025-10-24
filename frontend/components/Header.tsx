@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { Wallet, Home, FileText, Coins, Zap, LayoutDashboard, Store, ArrowLeftRight } from 'lucide-react';
+import { Wallet, Home, FileText, Coins, Zap, LayoutDashboard, Store, ArrowLeftRight, Database } from 'lucide-react';
 
 export function Header() {
   return (
@@ -32,6 +32,10 @@ export function Header() {
             <Link href="/dex" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition">
               <ArrowLeftRight className="w-4 h-4" />
               <span>DEX</span>
+            </Link>
+            <Link href="/oracle" className="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition">
+              <Database className="w-4 h-4" />
+              <span>Oracle</span>
             </Link>
             <Link href="/kyc" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition">
               <FileText className="w-4 h-4" />

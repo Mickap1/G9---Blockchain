@@ -6,11 +6,13 @@ import { formatUnits, formatEther } from 'viem';
 import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
 import NFTTokenV2ABI from '@/lib/abis/NFTAssetTokenV2.json';
 import SimpleDEXABI from '@/lib/abis/SimpleDEX.json';
+import SimplePriceOracleABI from '@/lib/abis/SimplePriceOracle.json';
 import { Header } from '@/components/Header';
 
 const FUNGIBLE_TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f';
 const NFT_TOKEN_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946';
 const DEX_ADDRESS = '0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98';
+const ORACLE_ADDRESS = '0x602571F05745181fF237b81dAb8F67148e9475C7';
 
 interface NFTData {
   tokenId: number;
@@ -18,6 +20,7 @@ interface NFTData {
   isActive: boolean;
   uri: string;
   metadata?: any;
+  oraclePrice?: bigint; // Prix de l'Oracle
 }
 
 interface FungibleTokenInfo {
@@ -56,6 +59,8 @@ export default function DashboardPage() {
   const [totalValue, setTotalValue] = useState(0);
   const [ethPriceEUR, setEthPriceEUR] = useState(0);
   const [liquidityPosition, setLiquidityPosition] = useState<LiquidityPosition | null>(null);
+  const [oraclePrice, setOraclePrice] = useState<bigint | null>(null);
+  const [oraclePriceActive, setOraclePriceActive] = useState(false);
 
   // Fetch ETH price in EUR
   const fetchEthPrice = async () => {
@@ -172,6 +177,24 @@ export default function DashboardPage() {
             args: [tokenId],
           }) as [bigint, boolean, string];
 
+          // Charger le prix depuis l'Oracle
+          let oraclePrice = BigInt(0);
+          try {
+            const priceData = await publicClient.readContract({
+              address: ORACLE_ADDRESS as `0x${string}`,
+              abi: SimplePriceOracleABI,
+              functionName: 'nftPrices',
+              args: [NFT_TOKEN_ADDRESS, tokenId],
+            }) as { price: bigint; lastUpdate: bigint; updateCount: bigint; isActive: boolean };
+
+            if (priceData.isActive && priceData.price > BigInt(0)) {
+              oraclePrice = priceData.price;
+              console.log(`NFT #${Number(tokenId)} - Prix Oracle: ${formatEther(oraclePrice)} EUR`);
+            }
+          } catch (error) {
+            console.log(`NFT #${Number(tokenId)} - Aucun prix Oracle défini`);
+          }
+
           // Try to fetch metadata
           let metadata = null;
           if (uri) {
@@ -242,6 +265,7 @@ export default function DashboardPage() {
             isActive,
             uri,
             metadata,
+            oraclePrice, // Ajout du prix Oracle
           };
         } catch (error) {
           console.error(`Error loading NFT ${tokenId}:`, error);
@@ -252,13 +276,14 @@ export default function DashboardPage() {
       const nftData = (await Promise.all(nftDataPromises)).filter(nft => nft !== null) as NFTData[];
       setNfts(nftData);
 
-      // Calculate total NFT value - check multiple possible field names
+      // Calculate total NFT value from Oracle prices
       const nftTotalValue = nftData.reduce((sum, nft) => {
-        const val = parseFloat(nft.metadata?.valuation?.toString() || nft.metadata?.value?.toString() || '0');
-        console.log(`NFT #${nft.tokenId} valuation:`, val, nft.metadata);
-        return sum + val;
+        const oraclePriceInEur = nft.oraclePrice ? parseFloat(formatEther(nft.oraclePrice)) : 0;
+        console.log(`NFT #${nft.tokenId} valeur Oracle:`, oraclePriceInEur, 'EUR');
+        return sum + oraclePriceInEur;
       }, 0);
 
+      console.log('Valeur totale des NFTs (Oracle):', nftTotalValue, 'EUR');
       setTotalValue(nftTotalValue);
     } catch (error) {
       console.error('Error loading NFTs:', error);
@@ -320,8 +345,35 @@ export default function DashboardPage() {
       loadFungibleTokenInfo(),
       loadNFTs(),
       loadLiquidityPosition(),
+      loadOraclePrice(),
     ]);
     setLoading(false);
+  };
+
+  // Load Oracle Price
+  const loadOraclePrice = async () => {
+    if (!publicClient) return;
+
+    try {
+      const priceData = await publicClient.readContract({
+        address: ORACLE_ADDRESS as `0x${string}`,
+        abi: SimplePriceOracleABI,
+        functionName: 'getPriceData',
+        args: [FUNGIBLE_TOKEN_ADDRESS],
+      }) as { price: bigint; lastUpdate: bigint; updateCount: bigint; isActive: boolean };
+
+      if (priceData.isActive && priceData.price > BigInt(0)) {
+        setOraclePrice(priceData.price);
+        setOraclePriceActive(true);
+      } else {
+        setOraclePrice(null);
+        setOraclePriceActive(false);
+      }
+    } catch (error) {
+      console.log('Oracle price not available:', error);
+      setOraclePrice(null);
+      setOraclePriceActive(false);
+    }
   };
 
   useEffect(() => {
@@ -345,241 +397,245 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
       <div className="container mx-auto px-4 py-8">
+        {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Mon Dashboard</h1>
-          <p className="text-gray-600">Vue d'ensemble de votre portefeuille d'actifs tokenisés</p>
+          <h1 className="text-4xl font-bold text-white mb-2">💼 Mon Dashboard</h1>
+          <p className="text-gray-300">Vue d'ensemble de votre portefeuille d'actifs tokenisés</p>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Chargement de votre portefeuille...</p>
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+            <p className="mt-4 text-gray-300">Chargement de votre portefeuille...</p>
           </div>
         ) : (
-          <>
-            {/* Valeur du Portefeuille */}
-            <div className="mb-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-xl p-8 text-white">
-              <h2 className="text-xl font-semibold mb-4">💰 Valeur Totale du Portefeuille</h2>
-              <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-5xl font-bold">
-                  {(
-                    totalValue + 
-                    (fungibleTokenInfo?.totalValue || 0) * parseFloat(fungibleBalance) +
-                    (ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)) * ethPriceEUR : 0)
-                  ).toLocaleString('fr-FR', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}
-                </span>
-                <span className="text-2xl">EUR</span>
+          <div className="space-y-6">
+            {/* 📊 RÉSUMÉ FINANCIER */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-2xl p-8 text-white">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                📊 Résumé Financier
+              </h2>
+              
+              {/* Valeur totale */}
+              <div className="mb-6">
+                <p className="text-sm opacity-80 mb-2">Valeur Totale du Portefeuille</p>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-6xl font-bold">
+                    {(
+                      totalValue + 
+                      (oraclePriceActive && oraclePrice 
+                        ? parseFloat(fungibleBalance) * parseFloat(formatEther(oraclePrice))
+                        : (fungibleTokenInfo && fungibleTokenInfo.maxSupply > 0)
+                          ? parseFloat(fungibleBalance) * (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply)
+                          : 0
+                      ) +
+                      (ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)) * ethPriceEUR : 0)
+                    ).toLocaleString('fr-FR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </span>
+                  <span className="text-3xl opacity-90">EUR</span>
+                </div>
+                {ethPriceEUR > 0 && (
+                  <p className="text-sm opacity-75 mt-2">Prix ETH: {ethPriceEUR.toLocaleString('fr-FR')} €</p>
+                )}
               </div>
-              {ethPriceEUR > 0 && (
-                <p className="text-sm opacity-75 mb-4">1 ETH = {ethPriceEUR.toLocaleString('fr-FR')} €</p>
-              )}
-              <div className="mt-4 grid grid-cols-3 gap-4">
-                <div className="bg-white/20 rounded-lg p-4">
-                  <p className="text-sm opacity-90">ETH Sepolia</p>
-                  <p className="text-2xl font-bold">
-                    {ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)).toFixed(4) : '0'} ETH
+
+              {/* Répartition */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* ETH */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">💎</span>
+                    <p className="text-sm font-medium opacity-90">ETH Sepolia</p>
+                  </div>
+                  <p className="text-3xl font-bold mb-2">
+                    {ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)).toFixed(4) : '0'}
                   </p>
-                  <p className="text-xs opacity-75 mt-1">
-                    ≈ {(ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)) * ethPriceEUR : 0).toLocaleString('fr-FR')} €
+                  <p className="text-sm opacity-75">
+                    ≈ {(ethBalance ? parseFloat(formatUnits(ethBalance.value, 18)) * ethPriceEUR : 0).toLocaleString('fr-FR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })} EUR
                   </p>
                 </div>
-                <div className="bg-white/20 rounded-lg p-4">
-                  <p className="text-sm opacity-90">Tokens Fongibles</p>
-                  <p className="text-2xl font-bold">
-                    {((fungibleTokenInfo?.totalValue || 0) * parseFloat(fungibleBalance)).toLocaleString('fr-FR')} €
+
+                {/* Tokens RWAT */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">🪙</span>
+                    <p className="text-sm font-medium opacity-90">Tokens {fungibleTokenInfo?.symbol || 'RWAT'}</p>
+                  </div>
+                  <p className="text-3xl font-bold mb-2">
+                    {parseFloat(fungibleBalance).toLocaleString('fr-FR', { maximumFractionDigits: 2 })}
+                  </p>
+                  <p className="text-sm opacity-75">
+                    ≈ {(oraclePriceActive && oraclePrice 
+                      ? parseFloat(fungibleBalance) * parseFloat(formatEther(oraclePrice))
+                      : (fungibleTokenInfo && fungibleTokenInfo.maxSupply > 0)
+                        ? parseFloat(fungibleBalance) * (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply)
+                        : 0
+                    ).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} EUR
                   </p>
                 </div>
-                <div className="bg-white/20 rounded-lg p-4">
-                  <p className="text-sm opacity-90">NFTs</p>
-                  <p className="text-2xl font-bold">{totalValue.toLocaleString('fr-FR')} €</p>
+
+                {/* NFTs */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">🎨</span>
+                    <p className="text-sm font-medium opacity-90">NFTs ({nfts.length})</p>
+                  </div>
+                  <p className="text-3xl font-bold mb-2">
+                    {nfts.length}
+                  </p>
+                  <p className="text-sm opacity-75">
+                    ≈ {totalValue.toLocaleString('fr-FR', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })} EUR
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Informations sur l'Actif Sous-Jacent */}
+            {/* 🪙 TOKENS RWAT */}
             {fungibleTokenInfo && fungibleTokenInfo.maxSupply > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span>🏢</span> Actif Sous-Jacent
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  🪙 Mes Tokens {fungibleTokenInfo.symbol}
                 </h2>
-                <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 rounded-xl shadow-lg p-8 text-white">
-                  {/* En-tête de l'actif */}
-                  <div className="border-b border-white/30 pb-6 mb-6">
-                    <h3 className="text-3xl font-bold mb-2">
-                      {fungibleTokenInfo.assetName || fungibleTokenInfo.name}
-                    </h3>
-                    <div className="flex items-center gap-4 text-sm opacity-90">
-                      <span className="flex items-center gap-2">
-                        📍 {fungibleTokenInfo.location || 'Localisation non spécifiée'}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        🏷️ {fungibleTokenInfo.assetType}
-                      </span>
-                    </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Balance */}
+                  <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+                    <p className="text-gray-400 text-sm mb-2">Votre Balance</p>
+                    <p className="text-4xl font-bold text-white mb-1">
+                      {parseFloat(fungibleBalance).toLocaleString('fr-FR', { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2 
+                      })}
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      tokens {fungibleTokenInfo.symbol}
+                    </p>
                   </div>
 
-                  {/* Statistiques de l'actif */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
-                      <p className="text-sm opacity-80 mb-2">Valeur Totale de l'Actif</p>
-                      <p className="text-3xl font-bold mb-1">
-                        {fungibleTokenInfo.totalValue.toLocaleString('fr-FR')} €
-                      </p>
-                      <p className="text-xs opacity-70">
-                        Évaluation professionnelle
-                      </p>
-                    </div>
-
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
-                      <p className="text-sm opacity-80 mb-2">Tokens Totaux Émis</p>
-                      <p className="text-3xl font-bold mb-1">
-                        {fungibleTokenInfo.maxSupply.toLocaleString('fr-FR')}
-                      </p>
-                      <p className="text-xs opacity-70">
-                        {fungibleTokenInfo.symbol}
-                      </p>
-                    </div>
-
-                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
-                      <p className="text-sm opacity-80 mb-2">Valeur par Token</p>
-                      <p className="text-3xl font-bold mb-1">
-                        {(fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply).toFixed(2)} €
-                      </p>
-                      <p className="text-xs opacity-70">
-                        Prix unitaire
-                      </p>
-                    </div>
+                  {/* Valeur */}
+                  <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+                    <p className="text-gray-400 text-sm mb-2">
+                      Valeur {oraclePriceActive ? '(Prix Oracle)' : '(Prix initial)'}
+                    </p>
+                    <p className="text-4xl font-bold text-white mb-1">
+                      {(oraclePriceActive && oraclePrice 
+                        ? parseFloat(fungibleBalance) * parseFloat(formatEther(oraclePrice))
+                        : parseFloat(fungibleBalance) * (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply)
+                      ).toLocaleString('fr-FR', { 
+                        minimumFractionDigits: 2, 
+                        maximumFractionDigits: 2 
+                      })} <span className="text-2xl text-gray-400">EUR</span>
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      Prix unitaire: {oraclePriceActive && oraclePrice 
+                        ? parseFloat(formatEther(oraclePrice)).toFixed(4)
+                        : (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply).toFixed(4)
+                      } EUR
+                    </p>
                   </div>
+                </div>
 
-                  {/* Votre participation */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="text-lg font-semibold mb-1">Votre Participation</p>
-                        <p className="text-sm opacity-80">
-                          Vous possédez <span className="font-bold">{parseFloat(fungibleBalance).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> tokens
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm opacity-80 mb-1">Part de propriété</p>
-                        <p className="text-4xl font-bold">
-                          {((parseFloat(fungibleBalance) / fungibleTokenInfo.maxSupply) * 100).toFixed(4)}%
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mt-4">
-                      <div className="bg-white/10 rounded-lg p-4">
-                        <p className="text-xs opacity-70 mb-1">Valeur de vos tokens</p>
-                        <p className="text-2xl font-bold">
-                          {(parseFloat(fungibleBalance) * (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply)).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
-                        </p>
-                      </div>
-                      <div className="bg-white/10 rounded-lg p-4">
-                        <p className="text-xs opacity-70 mb-1">Équivalent immobilier</p>
-                        <p className="text-lg font-bold">
-                          Comme si vous possédiez {((parseFloat(fungibleBalance) / fungibleTokenInfo.maxSupply) * 100).toFixed(2)}% de l'immeuble
-                        </p>
-                      </div>
-                    </div>
+                {/* Statistiques */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-1">Part de propriété</p>
+                    <p className="text-2xl font-bold text-white">
+                      {((parseFloat(fungibleBalance) / fungibleTokenInfo.maxSupply) * 100).toFixed(2)}%
+                    </p>
                   </div>
-
-                  {/* Informations complémentaires */}
-                  <div className="grid grid-cols-2 gap-4 mt-6">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                      <p className="text-xs opacity-70 mb-1">Date de Tokenisation</p>
-                      <p className="text-sm font-semibold">
-                        {fungibleTokenInfo.tokenizationDate > 0 
-                          ? new Date(fungibleTokenInfo.tokenizationDate * 1000).toLocaleDateString('fr-FR', {
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })
-                          : 'N/A'}
-                      </p>
-                    </div>
-                    {fungibleTokenInfo.documentURI && fungibleTokenInfo.documentURI !== 'ipfs://QmExampleDocumentHash' && (
-                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                        <p className="text-xs opacity-70 mb-1">Documents</p>
-                        <a 
-                          href={fungibleTokenInfo.documentURI.startsWith('ipfs://') 
-                            ? `https://ipfs.io/ipfs/${fungibleTokenInfo.documentURI.replace('ipfs://', '')}` 
-                            : fungibleTokenInfo.documentURI}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-semibold hover:underline flex items-center gap-1"
-                        >
-                          📄 Voir les documents →
-                        </a>
-                      </div>
-                    )}
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-1">Supply Total</p>
+                    <p className="text-2xl font-bold text-white">
+                      {fungibleTokenInfo.maxSupply.toLocaleString('fr-FR')}
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-1">Valeur Actif</p>
+                    <p className="text-2xl font-bold text-white">
+                      {fungibleTokenInfo.totalValue.toLocaleString('fr-FR')} €
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-1">Type</p>
+                    <p className="text-lg font-bold text-white">
+                      {fungibleTokenInfo.assetType}
+                    </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Liquidity Position */}
+            {/* 💧 POSITION DE LIQUIDITÉ DEX */}
             {liquidityPosition && parseFloat(liquidityPosition.lpTokens) > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span>💧</span> Ma Position de Liquidité
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  💧 Ma Position de Liquidité
                 </h2>
-                <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <div className="bg-white/20 rounded-lg p-4">
-                      <p className="text-sm opacity-90">LP Tokens</p>
-                      <p className="text-2xl font-bold">
-                        {parseFloat(liquidityPosition.lpTokens).toFixed(4)}
-                      </p>
-                    </div>
-                    <div className="bg-white/20 rounded-lg p-4">
-                      <p className="text-sm opacity-90">Part du Pool</p>
-                      <p className="text-2xl font-bold">
-                        {liquidityPosition.sharePercent.toFixed(2)}%
-                      </p>
-                    </div>
-                    <div className="bg-white/20 rounded-lg p-4">
-                      <p className="text-sm opacity-90">Tokens Disponibles</p>
-                      <p className="text-2xl font-bold">
-                        {parseFloat(liquidityPosition.tokenValue).toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="bg-white/20 rounded-lg p-4">
-                      <p className="text-sm opacity-90">ETH Disponibles</p>
-                      <p className="text-2xl font-bold">
-                        {parseFloat(liquidityPosition.ethValue).toFixed(4)} ETH
-                      </p>
-                    </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-2">LP Tokens</p>
+                    <p className="text-3xl font-bold text-white">
+                      {parseFloat(liquidityPosition.lpTokens).toFixed(4)}
+                    </p>
                   </div>
-                  <div className="bg-white/10 rounded-lg p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm opacity-90">Valeur Totale</p>
-                      <p className="text-3xl font-bold">
-                        {parseFloat(liquidityPosition.totalValueETH).toFixed(4)} ETH
-                      </p>
-                      <p className="text-sm opacity-75 mt-1">
-                        ≈ {(parseFloat(liquidityPosition.totalValueETH) * ethPriceEUR).toLocaleString('fr-FR')} €
-                      </p>
-                    </div>
-                    <a 
-                      href="/dex"
-                      className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-                    >
-                      Gérer la Liquidité →
-                    </a>
+                  <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-2">Part du Pool</p>
+                    <p className="text-3xl font-bold text-white">
+                      {liquidityPosition.sharePercent.toFixed(2)}%
+                    </p>
                   </div>
+                  <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-2">Tokens Disponibles</p>
+                    <p className="text-3xl font-bold text-white">
+                      {parseFloat(liquidityPosition.tokenValue).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-5 border border-white/10">
+                    <p className="text-gray-400 text-xs mb-2">ETH Disponibles</p>
+                    <p className="text-3xl font-bold text-white">
+                      {parseFloat(liquidityPosition.ethValue).toFixed(4)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-xl p-6 border border-white/10 mt-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-400 text-sm mb-2">Valeur Totale Estimée</p>
+                    <p className="text-4xl font-bold text-white mb-1">
+                      {parseFloat(liquidityPosition.totalValueETH).toFixed(4)} <span className="text-2xl text-gray-400">ETH</span>
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      ≈ {(parseFloat(liquidityPosition.totalValueETH) * ethPriceEUR).toLocaleString('fr-FR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })} EUR
+                    </p>
+                  </div>
+                  <a 
+                    href="/dex"
+                    className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                  >
+                    Gérer la Liquidité →
+                  </a>
                 </div>
               </div>
             )}
 
-            {/* Tokens Fongibles */}
-            <div className="mb-8">
+            {/* 🎨 MES NFTs */}
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
               <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <span>🪙</span> Mes Tokens Fongibles
               </h2>
@@ -732,28 +788,38 @@ export default function DashboardPage() {
                           </p>
                         )}
 
-                        {/* Valuation */}
-                        {nft.metadata?.valuation && (
-                          <div className="mb-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                            <p className="text-xs text-gray-600">Valorisation</p>
-                            <p className="text-xl font-bold text-green-600">
-                              {nft.metadata.valuation.toLocaleString('fr-FR')} {nft.metadata.valuationCurrency || 'EUR'}
+                        {/* Valorisation Oracle */}
+                        {nft.oraclePrice && nft.oraclePrice > BigInt(0) ? (
+                          <div className="mb-3 p-3 bg-purple-500/20 rounded-lg border border-purple-500/30">
+                            <p className="text-xs text-purple-300">
+                              📊 Prix Oracle (dynamique)
                             </p>
+                            <p className="text-xl font-bold text-purple-400">
+                              {parseFloat(formatEther(nft.oraclePrice)).toLocaleString('fr-FR', { 
+                                minimumFractionDigits: 2, 
+                                maximumFractionDigits: 2 
+                              })} EUR
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="mb-3 p-3 bg-white/5 rounded-lg border border-white/10">
+                            <p className="text-xs text-gray-400">Prix Oracle</p>
+                            <p className="text-sm text-gray-500">En attente...</p>
                           </div>
                         )}
 
                         {/* Attributes */}
                         {nft.metadata?.attributes && nft.metadata.attributes.length > 0 && (
                           <div className="mb-3">
-                            <p className="text-xs text-gray-600 mb-2">Attributs</p>
+                            <p className="text-xs text-gray-400 mb-2">Attributs</p>
                             <div className="flex flex-wrap gap-2">
                               {nft.metadata.attributes.slice(0, 3).map((attr: any, idx: number) => (
-                                <span key={idx} className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded">
+                                <span key={idx} className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded">
                                   {attr.trait_type}: {attr.value}
                                 </span>
                               ))}
                               {nft.metadata.attributes.length > 3 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                                <span className="px-2 py-1 bg-white/10 text-gray-400 text-xs rounded">
                                   +{nft.metadata.attributes.length - 3}
                                 </span>
                               )}
@@ -794,7 +860,7 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

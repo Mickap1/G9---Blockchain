@@ -3,27 +3,28 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Script d'auto-update du prix d'un diamant (NFT) toutes les heures
+ * Script d'auto-update des prix de TOUS les NFTs toutes les X minutes
  * 
  * Ce script:
  * - Tourne en continu
- * - Change le prix toutes les heures
- * - Multiplie par un facteur aléatoire entre 0.8 et 1.2
+ * - Détecte automatiquement tous les NFTs existants
+ * - Change le prix de chaque NFT individuellement
+ * - Multiplie par un facteur aléatoire entre 0.8 et 1.2 (±20%)
  * 
  * Usage:
- *   npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia
+ *   npx hardhat run scripts/auto-update-all-nft-prices.ts --network sepolia
  * 
  * Pour laisser tourner en background (PowerShell):
- *   Start-Process npx -ArgumentList "hardhat", "run", "scripts/auto-update-diamond-price.ts", "--network", "sepolia" -WindowStyle Hidden
+ *   Start-Process npx -ArgumentList "hardhat", "run", "scripts/auto-update-all-nft-prices.ts", "--network", "sepolia" -WindowStyle Hidden
  */
 
 // ========== CONFIGURATION ==========
 
-// const UPDATE_INTERVAL = 60 * 60 * 1000; // 1 heure en millisecondes (pour production)
-const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes pour test
+const UPDATE_INTERVAL = 3 * 60 * 1000; // 3 minutes pour test
 
 const MIN_MULTIPLIER = 0.8;  // Prix minimum: × 0.8 (-20%)
 const MAX_MULTIPLIER = 1.2;  // Prix maximum: × 1.2 (+20%)
+const DEFAULT_NFT_PRICE = ethers.parseEther("50000.0"); // Prix par défaut: 50,000 EUR
 
 // ========== FONCTIONS ==========
 
@@ -37,9 +38,8 @@ function randomBetween(min: number, max: number): number {
 /**
  * Mettre à jour le prix d'un NFT dans l'oracle
  */
-async function updateDiamondPrice(
+async function updateNFTPrice(
   oracle: any,
-  nft: any,
   nftAddress: string,
   tokenId: number,
   currentPrice: bigint
@@ -56,10 +56,8 @@ async function updateDiamondPrice(
   const changeSymbol = multiplier >= 1 ? "+" : "";
   
   console.log("\n" + "=".repeat(60));
-  console.log("💎 MISE À JOUR DU PRIX DU DIAMANT");
+  console.log(`💎 MISE À JOUR DU PRIX DU NFT #${tokenId}`);
   console.log("=".repeat(60));
-  console.log("Heure:", new Date().toLocaleString());
-  console.log("Token ID:", tokenId);
   console.log("Ancien prix:", ethers.formatEther(currentPrice), "EUR");
   console.log("Multiplicateur:", multiplier.toFixed(4));
   console.log("Nouveau prix:", ethers.formatEther(newPrice), "EUR");
@@ -74,15 +72,7 @@ async function updateDiamondPrice(
     
     const receipt = await tx.wait();
     console.log("   ✅ Oracle mis à jour!");
-    console.log("   Bloc:", receipt?.blockNumber);
     console.log("   Gas utilisé:", receipt?.gasUsed.toString());
-    
-    // NFTAssetTokenV2 n'a plus de fonction updateValuation
-    // Le prix est uniquement stocké dans l'Oracle
-    console.log("   ℹ️  Prix stocké dans l'Oracle uniquement (NFTAssetTokenV2 n'a pas de valuation on-chain)");
-    
-    console.log("\n🔗 View on Etherscan:");
-    console.log("   https://sepolia.etherscan.io/tx/" + receipt?.hash);
     
     return newPrice;
     
@@ -93,10 +83,87 @@ async function updateDiamondPrice(
 }
 
 /**
+ * Obtenir tous les NFTs existants
+ */
+async function getAllNFTs(nft: any): Promise<number[]> {
+  try {
+    // Obtenir le total supply
+    const totalSupply = await nft.totalSupply();
+    const total = Number(totalSupply);
+    
+    console.log("📊 Total Supply:", total, "NFTs");
+    
+    if (total === 0) {
+      console.log("⚠️  Aucun NFT n'a été minté");
+      return [];
+    }
+    
+    // Récupérer tous les token IDs (les NFTs sont numérotés de 0 à totalSupply-1)
+    const tokenIds: number[] = [];
+    for (let i = 0; i < total; i++) {
+      try {
+        // Vérifier si le NFT existe (il pourrait avoir été brûlé)
+        const owner = await nft.ownerOf(i);
+        if (owner && owner !== ethers.ZeroAddress) {
+          tokenIds.push(i);
+        }
+      } catch (error) {
+        // NFT brûlé ou n'existe pas
+        console.log(`   ⚠️  NFT #${i} n'existe pas ou a été brûlé`);
+      }
+    }
+    
+    return tokenIds;
+  } catch (error: any) {
+    console.error("❌ Erreur lors de la récupération des NFTs:", error.message);
+    return [];
+  }
+}
+
+/**
+ * Initialiser les prix de tous les NFTs
+ */
+async function initializeNFTPrices(
+  oracle: any,
+  nftAddress: string,
+  tokenIds: number[]
+): Promise<Map<number, bigint>> {
+  const prices = new Map<number, bigint>();
+  
+  console.log("\n" + "=".repeat(60));
+  console.log("🔄 INITIALISATION DES PRIX");
+  console.log("=".repeat(60));
+  
+  for (const tokenId of tokenIds) {
+    try {
+      // Essayer de récupérer le prix existant
+      const priceData = await oracle.nftPrices(nftAddress, tokenId);
+      
+      if (priceData.isActive && priceData.price > 0n) {
+        prices.set(tokenId, priceData.price);
+        console.log(`NFT #${tokenId}: ${ethers.formatEther(priceData.price)} EUR (existant)`);
+      } else {
+        // Initialiser avec le prix par défaut
+        console.log(`NFT #${tokenId}: Initialisation à ${ethers.formatEther(DEFAULT_NFT_PRICE)} EUR...`);
+        const tx = await oracle.updateNFTPrice(nftAddress, tokenId, DEFAULT_NFT_PRICE);
+        await tx.wait();
+        prices.set(tokenId, DEFAULT_NFT_PRICE);
+        console.log(`   ✅ Initialisé`);
+      }
+    } catch (error: any) {
+      console.error(`   ❌ Erreur NFT #${tokenId}:`, error.message);
+      prices.set(tokenId, DEFAULT_NFT_PRICE);
+    }
+  }
+  
+  return prices;
+}
+
+/**
  * Boucle principale
  */
 async function main() {
-  console.log("\n💎 DIAMOND PRICE AUTO-UPDATE SCRIPT");
+  console.log("\n💎 ALL NFT PRICES AUTO-UPDATE SCRIPT");
   console.log("=".repeat(60));
   console.log("Intervalle:", UPDATE_INTERVAL / 1000 / 60, "minutes");
   console.log("Variation:", MIN_MULTIPLIER, "à", MAX_MULTIPLIER);
@@ -138,63 +205,21 @@ async function main() {
   const oracle = await ethers.getContractAt("SimplePriceOracle", oracleAddress);
   const nft = await ethers.getContractAt("NFTAssetTokenV2", nftAddress);
   
-  // Vérifier quel Token ID nous allons mettre à jour
-  const TOKEN_ID = 0; // ID du premier NFT (diamant) - commence à 0
+  // Récupérer tous les NFTs existants
+  const tokenIds = await getAllNFTs(nft);
   
-  console.log("\n💎 Diamond NFT Token ID:", TOKEN_ID);
-  
-  // Vérifier si le NFT existe
-  try {
-    const owner = await nft.ownerOf(TOKEN_ID);
-    console.log("   Owner:", owner);
-    
-    // NFTAssetTokenV2 n'a que tokenizationDate et isActive
-    const assetData = await nft.assetData(TOKEN_ID);
-    console.log("   Tokenization Date:", new Date(Number(assetData.tokenizationDate) * 1000).toLocaleDateString());
-    console.log("   Is Active:", assetData.isActive);
-    
-    // Récupérer l'URI pour voir le nom dans la metadata
-    try {
-      const uri = await nft.tokenURI(TOKEN_ID);
-      console.log("   URI:", uri.substring(0, 50) + "...");
-    } catch (e) {
-      console.log("   URI: Non disponible");
-    }
-  } catch (error) {
-    console.log("\n⚠️  Diamond NFT Token ID", TOKEN_ID, "n'existe pas encore!");
-    console.log("   Vous devez d'abord minter un diamant.");
-    console.log("   Run: npx hardhat run scripts/mint-diamond.ts --network", networkName);
+  if (tokenIds.length === 0) {
+    console.log("\n❌ Aucun NFT trouvé! Mintez d'abord des NFTs:");
+    console.log("   npx hardhat run scripts/mint-diamond.ts --network", networkName);
     process.exit(1);
   }
   
-  // Obtenir le prix initial depuis l'oracle
-  let currentPrice: bigint;
+  console.log("\n✅ NFTs trouvés:", tokenIds.join(", "));
   
-  try {
-    const priceData = await oracle.nftPrices(nftAddress, TOKEN_ID);
-    if (priceData.isActive && priceData.price > 0n) {
-      currentPrice = priceData.price;
-      console.log("\n✅ Prix dans l'Oracle:", ethers.formatEther(currentPrice), "EUR");
-      console.log("   Dernière mise à jour:", new Date(Number(priceData.lastUpdate) * 1000).toLocaleString());
-      console.log("   Nombre de mises à jour:", priceData.updateCount.toString());
-    } else {
-      throw new Error("Price not set");
-    }
-  } catch (error) {
-    console.log("\n⚠️  Prix initial non défini dans l'Oracle!");
-    
-    // NFTAssetTokenV2 n'a plus de valuation on-chain, utiliser un prix par défaut
-    currentPrice = ethers.parseEther("50000.0"); // 50,000 EUR par défaut pour un diamant
-    
-    console.log("   Initialisation du prix dans l'Oracle:", ethers.formatEther(currentPrice), "EUR");
-    
-    const tx = await oracle.updateNFTPrice(nftAddress, TOKEN_ID, currentPrice);
-    await tx.wait();
-    console.log("   ✅ Prix initial défini dans l'Oracle!");
-  }
+  // Initialiser les prix de tous les NFTs
+  const currentPrices = await initializeNFTPrices(oracle, nftAddress, tokenIds);
   
-  console.log("\n✅ Script prêt! Mise à jour toutes les", UPDATE_INTERVAL / 1000 / 60, "minutes");
-  console.log("💡 Tip: Pour tester rapidement, réduisez UPDATE_INTERVAL à 2 minutes (ligne 16)");
+  console.log("\n✅ Script prêt! Mise à jour de", tokenIds.length, "NFTs toutes les", UPDATE_INTERVAL / 1000 / 60, "minutes");
   console.log("⏹️  Appuyez sur Ctrl+C pour arrêter\n");
   
   // Boucle infinie
@@ -204,11 +229,20 @@ async function main() {
     // Attendre l'intervalle
     await new Promise(resolve => setTimeout(resolve, UPDATE_INTERVAL));
     
-    // Mettre à jour le prix
     updateCount++;
-    console.log("\n🔄 Mise à jour #" + updateCount);
+    console.log("\n" + "=".repeat(60));
+    console.log(`🔄 MISE À JOUR #${updateCount} - ${new Date().toLocaleString()}`);
+    console.log("=".repeat(60));
     
-    currentPrice = await updateDiamondPrice(oracle, nft, nftAddress, TOKEN_ID, currentPrice);
+    // Mettre à jour chaque NFT
+    for (const tokenId of tokenIds) {
+      const currentPrice = currentPrices.get(tokenId) || DEFAULT_NFT_PRICE;
+      const newPrice = await updateNFTPrice(oracle, nftAddress, tokenId, currentPrice);
+      currentPrices.set(tokenId, newPrice);
+      
+      // Pause de 5 secondes entre chaque NFT pour éviter les problèmes de nonce
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
     
     // Afficher le statut
     const nextUpdate = new Date(Date.now() + UPDATE_INTERVAL);
@@ -218,11 +252,8 @@ async function main() {
 }
 
 // Gestion propre de l'arrêt
-let updateCount = 0;
-
 process.on("SIGINT", () => {
   console.log("\n\n👋 Arrêt du script...");
-  console.log("Nombre de mises à jour effectuées:", updateCount);
   process.exit(0);
 });
 

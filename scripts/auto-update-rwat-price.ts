@@ -3,27 +3,27 @@ import fs from "fs";
 import path from "path";
 
 /**
- * Script d'auto-update du prix d'un diamant (NFT) toutes les heures
+ * Script d'auto-update du prix du token RWAT toutes les heures
  * 
  * Ce script:
  * - Tourne en continu
  * - Change le prix toutes les heures
- * - Multiplie par un facteur aléatoire entre 0.8 et 1.2
+ * - Multiplie par un facteur aléatoire entre 0.95 et 1.05 (±5%)
  * 
  * Usage:
- *   npx hardhat run scripts/auto-update-diamond-price.ts --network sepolia
+ *   npx hardhat run scripts/auto-update-rwat-price.ts --network sepolia
  * 
  * Pour laisser tourner en background (PowerShell):
- *   Start-Process npx -ArgumentList "hardhat", "run", "scripts/auto-update-diamond-price.ts", "--network", "sepolia" -WindowStyle Hidden
+ *   Start-Process npx -ArgumentList "hardhat", "run", "scripts/auto-update-rwat-price.ts", "--network", "sepolia" -WindowStyle Hidden
  */
 
 // ========== CONFIGURATION ==========
 
 // const UPDATE_INTERVAL = 60 * 60 * 1000; // 1 heure en millisecondes (pour production)
-const UPDATE_INTERVAL = 2 * 60 * 1000; // 2 minutes pour test
+const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 minutes pour test
 
-const MIN_MULTIPLIER = 0.8;  // Prix minimum: × 0.8 (-20%)
-const MAX_MULTIPLIER = 1.2;  // Prix maximum: × 1.2 (+20%)
+const MIN_MULTIPLIER = 0.95;  // Prix minimum: × 0.95 (-5%)
+const MAX_MULTIPLIER = 1.05;  // Prix maximum: × 1.05 (+5%)
 
 // ========== FONCTIONS ==========
 
@@ -35,13 +35,11 @@ function randomBetween(min: number, max: number): number {
 }
 
 /**
- * Mettre à jour le prix d'un NFT dans l'oracle
+ * Mettre à jour le prix du token RWAT dans l'oracle
  */
-async function updateDiamondPrice(
+async function updateRWATPrice(
   oracle: any,
-  nft: any,
-  nftAddress: string,
-  tokenId: number,
+  tokenAddress: string,
   currentPrice: bigint
 ): Promise<bigint> {
   // Générer multiplicateur aléatoire
@@ -56,10 +54,9 @@ async function updateDiamondPrice(
   const changeSymbol = multiplier >= 1 ? "+" : "";
   
   console.log("\n" + "=".repeat(60));
-  console.log("💎 MISE À JOUR DU PRIX DU DIAMANT");
+  console.log("💰 MISE À JOUR DU PRIX DU TOKEN RWAT");
   console.log("=".repeat(60));
   console.log("Heure:", new Date().toLocaleString());
-  console.log("Token ID:", tokenId);
   console.log("Ancien prix:", ethers.formatEther(currentPrice), "EUR");
   console.log("Multiplicateur:", multiplier.toFixed(4));
   console.log("Nouveau prix:", ethers.formatEther(newPrice), "EUR");
@@ -69,17 +66,13 @@ async function updateDiamondPrice(
   console.log("\n⏳ Mise à jour de l'Oracle...");
   
   try {
-    const tx = await oracle.updateNFTPrice(nftAddress, tokenId, newPrice);
+    const tx = await oracle.updatePrice(tokenAddress, newPrice);
     console.log("   Transaction envoyée:", tx.hash);
     
     const receipt = await tx.wait();
     console.log("   ✅ Oracle mis à jour!");
     console.log("   Bloc:", receipt?.blockNumber);
     console.log("   Gas utilisé:", receipt?.gasUsed.toString());
-    
-    // NFTAssetTokenV2 n'a plus de fonction updateValuation
-    // Le prix est uniquement stocké dans l'Oracle
-    console.log("   ℹ️  Prix stocké dans l'Oracle uniquement (NFTAssetTokenV2 n'a pas de valuation on-chain)");
     
     console.log("\n🔗 View on Etherscan:");
     console.log("   https://sepolia.etherscan.io/tx/" + receipt?.hash);
@@ -96,7 +89,7 @@ async function updateDiamondPrice(
  * Boucle principale
  */
 async function main() {
-  console.log("\n💎 DIAMOND PRICE AUTO-UPDATE SCRIPT");
+  console.log("\n💰 RWAT PRICE AUTO-UPDATE SCRIPT");
   console.log("=".repeat(60));
   console.log("Intervalle:", UPDATE_INTERVAL / 1000 / 60, "minutes");
   console.log("Variation:", MIN_MULTIPLIER, "à", MAX_MULTIPLIER);
@@ -119,9 +112,7 @@ async function main() {
   
   const addresses = JSON.parse(fs.readFileSync(deploymentsPath, "utf8"));
   const oracleAddress = addresses.oracle;
-  
-  // Utiliser NFTAssetTokenV2 (la bonne adresse)
-  const nftAddress = "0xf16b0641A9C56C6db30E052E90DB9358b6D2C946"; // NFTAssetTokenV2
+  const fungibleTokenAddress = addresses.fungibleToken;
   
   if (!oracleAddress) {
     console.log("❌ Oracle non déployé!");
@@ -129,49 +120,30 @@ async function main() {
     process.exit(1);
   }
   
+  if (!fungibleTokenAddress) {
+    console.log("❌ Fungible Token non déployé!");
+    process.exit(1);
+  }
+  
   console.log("\n📋 Configuration:");
   console.log("Oracle:", oracleAddress);
-  console.log("NFT Contract:", nftAddress);
+  console.log("RWAT Token:", fungibleTokenAddress);
   console.log("Network:", networkName);
   
   // Se connecter aux contrats
   const oracle = await ethers.getContractAt("SimplePriceOracle", oracleAddress);
-  const nft = await ethers.getContractAt("NFTAssetTokenV2", nftAddress);
+  const token = await ethers.getContractAt("FungibleAssetToken", fungibleTokenAddress);
   
-  // Vérifier quel Token ID nous allons mettre à jour
-  const TOKEN_ID = 0; // ID du premier NFT (diamant) - commence à 0
-  
-  console.log("\n💎 Diamond NFT Token ID:", TOKEN_ID);
-  
-  // Vérifier si le NFT existe
-  try {
-    const owner = await nft.ownerOf(TOKEN_ID);
-    console.log("   Owner:", owner);
-    
-    // NFTAssetTokenV2 n'a que tokenizationDate et isActive
-    const assetData = await nft.assetData(TOKEN_ID);
-    console.log("   Tokenization Date:", new Date(Number(assetData.tokenizationDate) * 1000).toLocaleDateString());
-    console.log("   Is Active:", assetData.isActive);
-    
-    // Récupérer l'URI pour voir le nom dans la metadata
-    try {
-      const uri = await nft.tokenURI(TOKEN_ID);
-      console.log("   URI:", uri.substring(0, 50) + "...");
-    } catch (e) {
-      console.log("   URI: Non disponible");
-    }
-  } catch (error) {
-    console.log("\n⚠️  Diamond NFT Token ID", TOKEN_ID, "n'existe pas encore!");
-    console.log("   Vous devez d'abord minter un diamant.");
-    console.log("   Run: npx hardhat run scripts/mint-diamond.ts --network", networkName);
-    process.exit(1);
-  }
+  // Vérifier le nom du token
+  const tokenName = await token.name();
+  const tokenSymbol = await token.symbol();
+  console.log("\n💎 Token:", tokenName, "(" + tokenSymbol + ")");
   
   // Obtenir le prix initial depuis l'oracle
   let currentPrice: bigint;
   
   try {
-    const priceData = await oracle.nftPrices(nftAddress, TOKEN_ID);
+    const priceData = await oracle.prices(fungibleTokenAddress);
     if (priceData.isActive && priceData.price > 0n) {
       currentPrice = priceData.price;
       console.log("\n✅ Prix dans l'Oracle:", ethers.formatEther(currentPrice), "EUR");
@@ -182,19 +154,17 @@ async function main() {
     }
   } catch (error) {
     console.log("\n⚠️  Prix initial non défini dans l'Oracle!");
+    console.log("   Initialisation avec 1.00 EUR");
     
-    // NFTAssetTokenV2 n'a plus de valuation on-chain, utiliser un prix par défaut
-    currentPrice = ethers.parseEther("50000.0"); // 50,000 EUR par défaut pour un diamant
+    currentPrice = ethers.parseEther("1.0");
     
-    console.log("   Initialisation du prix dans l'Oracle:", ethers.formatEther(currentPrice), "EUR");
-    
-    const tx = await oracle.updateNFTPrice(nftAddress, TOKEN_ID, currentPrice);
+    const tx = await oracle.updatePrice(fungibleTokenAddress, currentPrice);
     await tx.wait();
     console.log("   ✅ Prix initial défini dans l'Oracle!");
   }
   
   console.log("\n✅ Script prêt! Mise à jour toutes les", UPDATE_INTERVAL / 1000 / 60, "minutes");
-  console.log("💡 Tip: Pour tester rapidement, réduisez UPDATE_INTERVAL à 2 minutes (ligne 16)");
+  console.log("💡 Tip: Pour tester rapidement, UPDATE_INTERVAL est défini à 5 minutes");
   console.log("⏹️  Appuyez sur Ctrl+C pour arrêter\n");
   
   // Boucle infinie
@@ -208,7 +178,7 @@ async function main() {
     updateCount++;
     console.log("\n🔄 Mise à jour #" + updateCount);
     
-    currentPrice = await updateDiamondPrice(oracle, nft, nftAddress, TOKEN_ID, currentPrice);
+    currentPrice = await updateRWATPrice(oracle, fungibleTokenAddress, currentPrice);
     
     // Afficher le statut
     const nextUpdate = new Date(Date.now() + UPDATE_INTERVAL);

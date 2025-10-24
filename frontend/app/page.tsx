@@ -1,6 +1,6 @@
 ﻿import { Header } from '@/components/Header';
 import Link from 'next/link';
-import { Coins, FileCheck, PlusSquare, TrendingUp, Zap, LayoutDashboard, Hammer } from 'lucide-react';
+import { Coins, FileCheck, PlusSquare, TrendingUp, Zap, LayoutDashboard, Hammer, Database } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -85,11 +85,11 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
             💱 Échanger des Actifs
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             <Link href="/kyc" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
               <FileCheck className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">KYC Verification</h3>
-              <p className="text-gray-600 text-sm">Obtenir la vérification pour accéder aux fonctionnalités</p>
+              <h3 className="text-xl font-semibold mb-2">KYC</h3>
+              <p className="text-gray-600 text-sm">Vérification pour accéder aux fonctionnalités</p>
             </Link>
             
             <Link href="/marketplace" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
@@ -100,8 +100,14 @@ export default function Home() {
             
             <Link href="/dex" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
               <TrendingUp className="w-12 h-12 text-orange-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">DEX Trading</h3>
-              <p className="text-gray-600 text-sm">Échanger des tokens et fournir de la liquidité</p>
+              <h3 className="text-xl font-semibold mb-2">DEX</h3>
+              <p className="text-gray-600 text-sm">Échanger des tokens et fournir liquidité</p>
+            </Link>
+
+            <Link href="/oracle" className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition transform hover:scale-105">
+              <Database className="w-12 h-12 text-indigo-600 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Oracle</h3>
+              <p className="text-gray-600 text-sm">Prix en temps réel des actifs</p>
             </Link>
           </div>
         </div>
