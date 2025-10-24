@@ -169,3 +169,4 @@ router.get("/health", (req, res) => {
     res.json({ success: true, status: "healthy", timestamp: new Date() });
 });
 exports.default = router;
+//# sourceMappingURL=routes.js.map

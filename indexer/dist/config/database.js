@@ -54,3 +54,4 @@ function getDatabase() {
     }
     return db;
 }
+//# sourceMappingURL=database.js.map

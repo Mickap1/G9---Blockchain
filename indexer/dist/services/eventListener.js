@@ -247,3 +247,4 @@ async function updateLastIndexedBlock(blockNumber) {
     const db = (0, database_1.getDatabase)();
     await db.collection("metadata").updateOne({ key: "lastIndexedBlock" }, { $set: { key: "lastIndexedBlock", value: blockNumber, updatedAt: new Date() } }, { upsert: true });
 }
+//# sourceMappingURL=eventListener.js.map

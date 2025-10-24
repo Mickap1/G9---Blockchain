@@ -73,3 +73,4 @@ process.on("SIGTERM", async () => {
 });
 // Démarrer l'application
 main();
+//# sourceMappingURL=index.js.map

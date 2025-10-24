@@ -41,3 +41,4 @@ exports.contracts = {
     nftToken: new ethers_1.ethers.Contract(exports.CONTRACTS.nftToken, exports.ABIS.nftToken, exports.provider),
     oracle: new ethers_1.ethers.Contract(exports.CONTRACTS.oracle, exports.ABIS.oracle, exports.provider),
 };
+//# sourceMappingURL=contracts.js.map
