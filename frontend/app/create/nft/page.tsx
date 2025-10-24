@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 import NFTTokenV2ABI from '@/lib/abis/NFTAssetTokenV2.json';
+import KYCRegistryABI from '@/lib/abis/KYCRegistry.json';
+import { contracts } from '@/lib/contracts';
 import { Header } from '@/components/Header';
 
-const NFT_V2_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946';
+const NFT_V2_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E';
 
 export default function CreateNFTPage() {
   const { address, isConnected } = useAccount();
@@ -13,6 +15,8 @@ export default function CreateNFTPage() {
   const { data: walletClient } = useWalletClient();
 
   const [loading, setLoading] = useState(false);
+  const [isKYCApproved, setIsKYCApproved] = useState<boolean>(false);
+  const [checkingKYC, setCheckingKYC] = useState<boolean>(true);
   
   // Metadata mode: 'uri' or 'manual'
   const [metadataMode, setMetadataMode] = useState<'uri' | 'manual'>('manual');
@@ -34,6 +38,43 @@ export default function CreateNFTPage() {
   // Collection info state
   const [collectionInfo, setCollectionInfo] = useState<any>(null);
   const [loadingInfo, setLoadingInfo] = useState(false);
+
+  // Vérifier le statut KYC de l'utilisateur
+  const checkKYCStatus = async () => {
+    if (!publicClient || !address) {
+      setCheckingKYC(false);
+      return;
+    }
+
+    try {
+      setCheckingKYC(true);
+      
+      // Récupérer l'adresse du KYC Registry depuis le contrat NFT
+      const kycRegistryAddress = await publicClient.readContract({
+        address: NFT_V2_ADDRESS,
+        abi: NFTTokenV2ABI,
+        functionName: 'kycRegistry',
+      }) as `0x${string}`;
+
+      console.log('KYC Registry Address:', kycRegistryAddress);
+
+      // Vérifier si l'utilisateur est whitelisté
+      const isWhitelisted = await publicClient.readContract({
+        address: kycRegistryAddress,
+        abi: KYCRegistryABI,
+        functionName: 'isWhitelisted',
+        args: [address],
+      }) as boolean;
+
+      console.log('User KYC Status:', isWhitelisted);
+      setIsKYCApproved(isWhitelisted);
+    } catch (error) {
+      console.error('Error checking KYC status:', error);
+      setIsKYCApproved(false);
+    } finally {
+      setCheckingKYC(false);
+    }
+  };
 
   // Load collection info
   const loadCollectionInfo = async () => {
@@ -85,10 +126,15 @@ export default function CreateNFTPage() {
 
   // Load info on mount
   useEffect(() => {
-    if (publicClient) {
+    if (publicClient && address) {
       loadCollectionInfo();
+      checkKYCStatus();
+      // Initialiser mintTo avec l'adresse de l'utilisateur par défaut
+      if (!mintTo) {
+        setMintTo(address);
+      }
     }
-  }, [publicClient]);
+  }, [publicClient, address]);
 
   const handleMintNFT = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,11 +214,15 @@ export default function CreateNFTPage() {
 
     setLoading(true);
     try {
+      // Utiliser mintAssetPublic si l'utilisateur mint pour lui-même
+      // Utiliser mintAsset (admin) s'il mint pour quelqu'un d'autre
+      const isMintingForSelf = mintTo.toLowerCase() === address?.toLowerCase();
+      
       const hash = await walletClient.writeContract({
         address: NFT_V2_ADDRESS,
         abi: NFTTokenV2ABI,
-        functionName: 'mintAsset',
-        args: [mintTo, finalMetadataURI],
+        functionName: isMintingForSelf ? 'mintAssetPublic' : 'mintAsset',
+        args: isMintingForSelf ? [finalMetadataURI] : [mintTo, finalMetadataURI],
       });
 
       alert(`✅ NFT minté avec succès!\nTransaction: ${hash}\n\nURI: ${finalMetadataURI}`);
@@ -278,30 +328,83 @@ export default function CreateNFTPage() {
             )}
           </div>
 
+          {/* Vérification du statut KYC */}
+          {checkingKYC ? (
+            <div className="mb-8 p-6 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+              <p className="text-yellow-200 flex items-center gap-2">
+                <span className="animate-spin">⏳</span> Vérification du statut KYC...
+              </p>
+            </div>
+          ) : !isKYCApproved ? (
+            <div className="mb-8 p-6 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <h3 className="text-xl font-bold text-red-300 mb-2 flex items-center gap-2">
+                <span>⛔</span> KYC Non Approuvé
+              </h3>
+              <p className="text-red-200 mb-4">
+                Votre compte n'est pas encore approuvé par le système KYC. Vous devez obtenir l'approbation KYC avant de pouvoir créer des NFT.
+              </p>
+              <div className="flex gap-3">
+                <a
+                  href="/kyc"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  📝 Soumettre une demande KYC
+                </a>
+                <button
+                  onClick={checkKYCStatus}
+                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  🔄 Revérifier
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="mb-8 p-6 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <p className="text-green-200 flex items-center gap-2">
+                <span>✅</span> Votre KYC est approuvé - Vous pouvez créer des NFT
+              </p>
+            </div>
+          )}
+
           {/* Mint Form */}
           <div className="bg-white/5 p-6 rounded-lg border border-white/10">
             <h2 className="text-xl font-semibold mb-4 text-white">✨ Minter un NFT</h2>
 
             <div className="mb-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
               <p className="text-sm text-blue-200">
-                <strong>ℹ️</strong> Le destinataire doit avoir un KYC approuvé.
+                <strong>ℹ️</strong> Avec KYC approuvé, vous pouvez créer des NFT pour vous-même ou pour d'autres adresses approuvées.
               </p>
             </div>
 
             <form onSubmit={handleMintNFT} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Adresse du destinataire *
+                  Destinataire *
                 </label>
-                <input
-                  type="text"
-                  value={mintTo}
-                  onChange={(e) => setMintTo(e.target.value)}
-                  placeholder="0x..."
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
-                  disabled={loading}
-                  required
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={mintTo}
+                    onChange={(e) => setMintTo(e.target.value)}
+                    placeholder={address || "0x..."}
+                    className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
+                    disabled={loading}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMintTo(address || '')}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium whitespace-nowrap"
+                    disabled={loading}
+                  >
+                    Moi-même
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  {mintTo.toLowerCase() === address?.toLowerCase() 
+                    ? '✓ Vous créez un NFT pour vous-même' 
+                    : 'Le destinataire doit avoir un KYC approuvé'}
+                </p>
               </div>
 
               {/* Mode Toggle */}
@@ -497,18 +600,18 @@ export default function CreateNFTPage() {
 
               <button
                 type="submit"
-                disabled={loading || !mintTo ||
+                disabled={loading || !isKYCApproved || !mintTo ||
                   (metadataMode === 'manual' && (!assetName || !description)) ||
                   (metadataMode === 'uri' && !metadataURI)}
                 className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
-                  loading || !mintTo ||
+                  loading || !isKYCApproved || !mintTo ||
                   (metadataMode === 'manual' && (!assetName || !description)) ||
                   (metadataMode === 'uri' && !metadataURI)
                     ? 'bg-gray-600 cursor-not-allowed opacity-50'
                     : 'bg-purple-600 hover:bg-purple-700'
                 }`}
               >
-                {loading ? 'Minting...' : '✨ Minter le NFT'}
+                {loading ? 'Minting...' : !isKYCApproved ? '🔒 KYC Requis' : '✨ Minter le NFT'}
               </button>
             </form>
           </div>

@@ -124,7 +124,7 @@ Pour implémenter un marketplace complet, il faudrait :
    - Filtres et recherche
 
 ### Contrats utilisés
-- NFTAssetTokenV2: `0xf16b0641A9C56C6db30E052E90DB9358b6D2C946`
+- NFTAssetTokenV2: `0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946`
 - FungibleToken: `0xfA451d9C32d15a637Ab376732303c36C34C9979f`
 
 ### Solution temporaire
@@ -177,7 +177,7 @@ Créer un fichier `.env.local` dans `frontend/` :
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id
 NEXT_PUBLIC_KYC_REGISTRY_ADDRESS=0x563E31793214F193EB7993a2bfAd2957a70C7D65
 NEXT_PUBLIC_FUNGIBLE_TOKEN_ADDRESS=0xfA451d9C32d15a637Ab376732303c36C34C9979f
-NEXT_PUBLIC_NFT_TOKEN_ADDRESS=0xf16b0641A9C56C6db30E052E90DB9358b6D2C946
+NEXT_PUBLIC_NFT_TOKEN_ADDRESS=0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946
 NEXT_PUBLIC_DEX_ADDRESS=0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4
 NEXT_PUBLIC_ORACLE_ADDRESS=0x602571F05745181fF237b81dAb8F67148e9475C7
 ```
@@ -245,7 +245,7 @@ Frontend accessible à : **http://localhost:3000**
 
 - [SimpleDEX Contract](https://sepolia.etherscan.io/address/0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4)
 - [FungibleToken Contract](https://sepolia.etherscan.io/address/0xfA451d9C32d15a637Ab376732303c36C34C9979f)
-- [NFT Contract](https://sepolia.etherscan.io/address/0xf16b0641A9C56C6db30E052E90DB9358b6D2C946)
+- [NFT Contract](https://sepolia.etherscan.io/address/0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946)
 - [Sepolia Faucet](https://sepoliafaucet.com/)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Wagmi Documentation](https://wagmi.sh/)

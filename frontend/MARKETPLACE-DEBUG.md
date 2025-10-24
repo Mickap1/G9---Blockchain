@@ -43,7 +43,7 @@ console.log('Mon adresse:', window.ethereum.selectedAddress);
 // Vérifier le solde de NFTs
 const publicClient = await window.viem.getPublicClient();
 const balance = await publicClient.readContract({
-  address: '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946',
+  address: '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946',
   abi: [...], // ABI du contrat NFT
   functionName: 'balanceOf',
   args: ['VOTRE_ADRESSE']
@@ -63,7 +63,7 @@ async function main() {
   const [owner, account1] = await ethers.getSigners();
   
   // Adresse du contrat NFT
-  const NFT_ADDRESS = "0xf16b0641A9C56C6db30E052E90DB9358b6D2C946";
+  const NFT_ADDRESS = "0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946";
   
   const NFTContract = await ethers.getContractAt("NFTAssetToken", NFT_ADDRESS);
   
@@ -106,7 +106,7 @@ npx hardhat run scripts/check-my-nfts.ts --network sepolia
 Dans `frontend/app/marketplace/page.tsx`, vérifiez que l'adresse est correcte :
 
 ```typescript
-const NFT_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946' as `0x${string}`;
+const NFT_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946' as `0x${string}`;
 ```
 
 Comparez avec l'adresse dans `deployments/sepolia-nft-token.json`.

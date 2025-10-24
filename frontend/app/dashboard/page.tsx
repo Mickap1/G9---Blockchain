@@ -11,7 +11,7 @@ import { Header } from '@/components/Header';
 import { RecentActivity } from '@/components/RecentActivity';
 
 const FUNGIBLE_TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f';
-const NFT_TOKEN_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946';
+const NFT_TOKEN_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E';
 const DEX_ADDRESS = '0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98';
 const ORACLE_ADDRESS = '0x602571F05745181fF237b81dAb8F67148e9475C7';
 
@@ -724,6 +724,21 @@ export default function DashboardPage() {
                           <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                             {nft.metadata.description}
                           </p>
+                        )}
+
+                        {/* Valeur depuis les métadonnées */}
+                        {nft.metadata?.valuation && (
+                          <div className="mb-3 p-3 bg-blue-500/20 rounded-lg border border-blue-500/30">
+                            <p className="text-xs text-blue-300">
+                              💎 Valeur Estimée
+                            </p>
+                            <p className="text-xl font-bold text-blue-400">
+                              {parseFloat(nft.metadata.valuation).toLocaleString('fr-FR', { 
+                                minimumFractionDigits: 2, 
+                                maximumFractionDigits: 2 
+                              })} {nft.metadata.valuationCurrency || 'EUR'}
+                            </p>
+                          </div>
                         )}
 
                         {/* Valorisation Oracle */}

@@ -65,7 +65,7 @@ Variation: ±20% (× 0.8 à ×1.2)
 
 📋 Configuration:
 Oracle: 0x602571F05745181fF237b81dAb8F67148e9475C7
-NFT Contract: 0xf16b0641A9C56C6db30E052E90DB9358b6D2C946
+NFT Contract: 0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946
 Network: sepolia
 
 ✅ Contrats connectés!
@@ -324,7 +324,7 @@ Les scripts affichent des logs détaillés :
 💎 MISE À JOUR DE TOUS LES NFTs
 ======================================================================
 Heure: 24/10/2025 17:00:00
-Contrat NFT: 0xf16b0641A9C56C6db30E052E90DB9358b6D2C946
+Contrat NFT: 0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946
 Nombre de NFTs: 3
 
 🔄 Mise à jour en cours...

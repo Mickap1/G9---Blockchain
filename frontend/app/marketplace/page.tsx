@@ -9,7 +9,7 @@ import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
 import MarketplaceABI from '@/lib/abis/Marketplace.json';
 import Image from 'next/image';
 
-const NFT_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946' as `0x${string}`;
+const NFT_ADDRESS = '0x75499Fc469f8d224C7bF619Ada37ea8f3cD8c36E641A9C56C6db30E052E90DB9358b6D2C946' as `0x${string}`;
 const TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f' as `0x${string}`;
 const MARKETPLACE_ADDRESS = '0x9F057E253D69f6d362C63A3DB0bdff66eE8013dd' as `0x${string}`;
 

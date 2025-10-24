@@ -303,7 +303,7 @@ L'indexeur fonctionne avec un **cron job** qui s'exécute **toutes les minutes**
 3. Variable d'environnement incorrecte :
    ```bash
    # Dans frontend/.env.local (déjà configuré)
-   NEXT_PUBLIC_INDEXER_API_URL=https://g9-blockchain-production-836a.up.railway.app
+   NEXT_PUBLIC_INDEXER_API_URL=https://g9-blockchain-production-e218.up.railway.app
    ```
 
 4. Redémarrer le frontend si tu viens de le modifier :

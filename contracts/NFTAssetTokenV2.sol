@@ -121,6 +121,33 @@ contract NFTAssetTokenV2 is
     }
     
     /**
+     * @notice Public mint function for KYC-approved users
+     * @dev Anyone with approved KYC can mint NFTs for themselves
+     * @param uri Metadata URI containing all asset information
+     * @return uint256 Token ID of minted NFT
+     */
+    function mintAssetPublic(
+        string memory uri
+    ) external returns (uint256) {
+        if (!kycRegistry.isWhitelisted(msg.sender)) revert SenderNotWhitelisted();
+        
+        uint256 tokenId = _nextTokenId++;
+        
+        _safeMint(msg.sender, tokenId);
+        _setTokenURI(tokenId, uri);
+        
+        // Minimal storage
+        assetData[tokenId] = AssetData({
+            tokenizationDate: block.timestamp,
+            isActive: true
+        });
+        
+        emit AssetMinted(tokenId, msg.sender, block.timestamp);
+        
+        return tokenId;
+    }
+    
+    /**
      * @notice Batch mint multiple NFTs (Gas Optimized)
      * @param recipients Array of recipient addresses
      * @param uris Array of metadata URIs
