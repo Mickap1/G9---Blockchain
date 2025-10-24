@@ -492,6 +492,63 @@ ETHERSCAN_API_KEY=votre_clé_etherscan
 
 ---
 
+## 🤖 Scripts Auto-Update (Hébergement)
+
+### `auto-update-all-nft-prices.ts` - Auto-Update Prix NFTs (Toutes les heures)
+
+Met à jour automatiquement le prix de **TOUS les NFTs** à chaque heure pile (XX:00).
+
+```bash
+npx hardhat run scripts/auto-update-all-nft-prices.ts --network sepolia
+```
+
+**Fonctionnement:**
+- Attend la prochaine heure pile (ex: 22h00, 23h00, 00h00)
+- Récupère `totalSupply()` du contrat NFT
+- Met à jour chaque NFT avec une variation de ±20%
+- Boucle infinie avec synchronisation horaire
+
+**Configuration:**
+- Variation: ×0.8 à ×1.2 (-20% à +20%)
+- Prix par défaut: 50,000 EUR (si non initialisé)
+- Planification: Chaque heure à XX:00
+
+### `auto-update-rwat-price.ts` - Auto-Update Prix RWAT (Toutes les heures)
+
+Met à jour automatiquement le prix du **token RWAT** à chaque heure pile (XX:00).
+
+```bash
+npx hardhat run scripts/auto-update-rwat-price.ts --network sepolia
+```
+
+**Fonctionnement:**
+- Attend la prochaine heure pile
+- Récupère le prix actuel dans l'Oracle
+- Applique une variation de ±10%
+- Met à jour via `oracle.updatePrice()`
+
+**Configuration:**
+- Variation: ×0.9 à ×1.1 (-10% à +10%)
+- Prix par défaut: 50 EUR (si non initialisé)
+- Planification: Chaque heure à XX:00
+
+**🚀 Hébergement:**
+Consultez le [Guide d'Hébergement](../AUTO-UPDATE-SCRIPTS-GUIDE.md) pour déployer ces scripts sur Railway, VPS, ou GitHub Actions.
+
+**Options disponibles:**
+- **Railway** (recommandé) - Gratuit, cloud, logs en ligne
+- **VPS + PM2** - Contrôle total, production
+- **GitHub Actions** - Intégré, simple
+- **Local Windows** - Task Scheduler
+
+**Fichiers de configuration:**
+- `ecosystem.config.js` - Configuration PM2
+- `railway-updaters.yml` - Configuration Railway
+- `start-nft-updater.bat` - Script Windows NFT
+- `start-rwat-updater.bat` - Script Windows RWAT
+
+---
+
 ## 💡 Astuces
 
 ### Économiser du Gas

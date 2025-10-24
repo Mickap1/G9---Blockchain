@@ -1,0 +1,21 @@
+# Railway Configuration for Price Updaters
+
+# Service 1: NFT Price Updater
+nft:
+  build:
+    command: npm install
+  start:
+    command: npx hardhat run scripts/auto-update-all-nft-prices.ts --network sepolia
+  env:
+    NODE_ENV: production
+    # Add ALCHEMY_API_KEY and SEPOLIA_PRIVATE_KEY in Railway dashboard
+
+# Service 2: RWAT Price Updater
+rwat:
+  build:
+    command: npm install
+  start:
+    command: npx hardhat run scripts/auto-update-rwat-price.ts --network sepolia
+  env:
+    NODE_ENV: production
+    # Add ALCHEMY_API_KEY and SEPOLIA_PRIVATE_KEY in Railway dashboard
