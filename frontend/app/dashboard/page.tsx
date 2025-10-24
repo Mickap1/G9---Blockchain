@@ -180,15 +180,18 @@ export default function DashboardPage() {
           // Charger le prix depuis l'Oracle
           let oraclePrice = BigInt(0);
           try {
-            const priceData = await publicClient.readContract({
+            const priceDataRaw = await publicClient.readContract({
               address: ORACLE_ADDRESS as `0x${string}`,
               abi: SimplePriceOracleABI,
               functionName: 'nftPrices',
               args: [NFT_TOKEN_ADDRESS, tokenId],
-            }) as { price: bigint; lastUpdate: bigint; updateCount: bigint; isActive: boolean };
+            }) as [bigint, bigint, bigint, boolean];
 
-            if (priceData.isActive && priceData.price > BigInt(0)) {
-              oraclePrice = priceData.price;
+            // Convertir le tuple en objet
+            oraclePrice = priceDataRaw[0];
+            const isActive = priceDataRaw[3];
+
+            if (isActive && oraclePrice > BigInt(0)) {
               console.log(`NFT #${Number(tokenId)} - Prix Oracle: ${formatEther(oraclePrice)} EUR`);
             }
           } catch (error) {
@@ -504,7 +507,7 @@ export default function DashboardPage() {
 
             {/* 🪙 TOKENS RWAT */}
             {fungibleTokenInfo && fungibleTokenInfo.maxSupply > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
+              <div className="bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 backdrop-blur-md rounded-xl p-8 border border-green-500/20">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                   🪙 Mes Tokens {fungibleTokenInfo.symbol}
                 </h2>
@@ -562,12 +565,6 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <p className="text-gray-400 text-xs mb-1">Valeur Actif</p>
-                    <p className="text-2xl font-bold text-white">
-                      {fungibleTokenInfo.totalValue.toLocaleString('fr-FR')} €
-                    </p>
-                  </div>
-                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
                     <p className="text-gray-400 text-xs mb-1">Type</p>
                     <p className="text-lg font-bold text-white">
                       {fungibleTokenInfo.assetType}
@@ -579,7 +576,7 @@ export default function DashboardPage() {
 
             {/* 💧 POSITION DE LIQUIDITÉ DEX */}
             {liquidityPosition && parseFloat(liquidityPosition.lpTokens) > 0 && (
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
+              <div className="bg-gradient-to-br from-blue-900/40 via-cyan-900/30 to-blue-800/40 backdrop-blur-md rounded-xl p-8 border border-blue-500/20">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                   💧 Ma Position de Liquidité
                 </h2>
@@ -634,76 +631,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* 🎨 MES NFTs */}
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-8 border border-white/20">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>🪙</span> Mes Tokens Fongibles
-              </h2>
-              <div className="bg-white rounded-lg shadow-md p-6">
-                {fungibleTokenInfo ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                          {fungibleTokenInfo.symbol?.substring(0, 2)}
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-gray-900">{fungibleTokenInfo.name}</h3>
-                          <p className="text-sm text-gray-600">{fungibleTokenInfo.symbol}</p>
-                          <p className="text-xs text-gray-500 mt-1">Type: {fungibleTokenInfo.assetType}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-3xl font-bold text-green-600">
-                          {parseFloat(fungibleBalance).toLocaleString('fr-FR', {
-                            minimumFractionDigits: 0,
-                            maximumFractionDigits: 2
-                          })}
-                        </p>
-                        <p className="text-sm text-gray-600">{fungibleTokenInfo.symbol}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Valeur unitaire: {fungibleTokenInfo.totalValue?.toLocaleString('fr-FR')} €
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4 mt-4">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Balance</p>
-                        <p className="text-xl font-bold text-gray-900">
-                          {parseFloat(fungibleBalance).toFixed(2)} {fungibleTokenInfo.symbol}
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Valeur Totale</p>
-                        <p className="text-xl font-bold text-gray-900">
-                          {((fungibleTokenInfo.totalValue || 0) * parseFloat(fungibleBalance)).toLocaleString('fr-FR')} €
-                        </p>
-                      </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-600">Contrat</p>
-                        <a 
-                          href={`https://sepolia.etherscan.io/address/${FUNGIBLE_TOKEN_ADDRESS}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:underline font-mono"
-                        >
-                          {FUNGIBLE_TOKEN_ADDRESS.substring(0, 10)}...
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-600 text-center py-8">Vous ne possédez pas de tokens fongibles</p>
-                )}
-              </div>
-            </div>
-
-            {/* Galerie de NFTs */}
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>🎨</span> Ma Galerie de NFTs
-                <span className="text-lg font-normal text-gray-600">({nfts.length})</span>
+            {/* 🎨 MA GALERIE DE NFTs */}
+            <div className="bg-gradient-to-br from-purple-900/40 via-pink-900/30 to-purple-800/40 backdrop-blur-md rounded-xl p-8 border border-purple-500/20">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                🎨 Ma Galerie de NFTs
+                <span className="text-lg font-normal text-gray-400">({nfts.length})</span>
               </h2>
               
               {nfts.length > 0 ? (
@@ -742,9 +674,9 @@ export default function DashboardPage() {
                     console.log(`NFT #${nft.tokenId} - Full metadata:`, nft.metadata);
 
                     return (
-                      <div key={nft.tokenId} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                      <div key={nft.tokenId} className="bg-white/5 rounded-xl overflow-hidden border border-white/10 hover:border-purple-500/50 transition-all">
                         {/* NFT Image */}
-                        <div className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center overflow-hidden">
+                        <div className="aspect-square bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden">
                           {imageUrl ? (
                             <img 
                               src={imageUrl} 
@@ -770,20 +702,20 @@ export default function DashboardPage() {
                       {/* NFT Info */}
                       <div className="p-4">
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-lg font-bold text-gray-900">
+                          <h3 className="text-lg font-bold text-white">
                             {nft.metadata?.name || `NFT #${nft.tokenId}`}
                           </h3>
                           <span className={`px-2 py-1 text-xs rounded-full ${
                             nft.isActive 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-gray-100 text-gray-700'
+                              ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                              : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
                           }`}>
                             {nft.isActive ? '✓ Actif' : 'Inactif'}
                           </span>
                         </div>
                         
                         {nft.metadata?.description && (
-                          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                          <p className="text-sm text-gray-400 mb-3 line-clamp-2">
                             {nft.metadata.description}
                           </p>
                         )}
@@ -792,7 +724,7 @@ export default function DashboardPage() {
                         {nft.oraclePrice && nft.oraclePrice > BigInt(0) ? (
                           <div className="mb-3 p-3 bg-purple-500/20 rounded-lg border border-purple-500/30">
                             <p className="text-xs text-purple-300">
-                              📊 Prix Oracle (dynamique)
+                              📊 Prix Oracle
                             </p>
                             <p className="text-xl font-bold text-purple-400">
                               {parseFloat(formatEther(nft.oraclePrice)).toLocaleString('fr-FR', { 
@@ -828,15 +760,15 @@ export default function DashboardPage() {
                         )}
 
                         {/* Footer */}
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                          <span className="text-xs text-gray-500">
+                        <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                          <span className="text-xs text-gray-400">
                             Token ID: #{nft.tokenId}
                           </span>
                           <a
                             href={`https://sepolia.etherscan.io/token/${NFT_TOKEN_ADDRESS}?a=${nft.tokenId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:underline"
+                            className="text-xs text-blue-400 hover:text-blue-300"
                           >
                             Voir sur Etherscan →
                           </a>
@@ -847,10 +779,10 @@ export default function DashboardPage() {
                   })}
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                <div className="bg-white/5 rounded-lg p-12 text-center border border-white/10">
                   <div className="text-6xl mb-4">🎨</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun NFT</h3>
-                  <p className="text-gray-600 mb-6">Vous ne possédez pas encore de NFT dans cette collection.</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">Aucun NFT</h3>
+                  <p className="text-gray-400 mb-6">Vous ne possédez pas encore de NFT dans cette collection.</p>
                   <a
                     href="/create/nft"
                     className="inline-block px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"

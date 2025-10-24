@@ -48,13 +48,13 @@ export default function KYCPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl p-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Vérification KYC</h1>
-              <p className="text-gray-600">
+            <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-8 text-center">
+              <h1 className="text-3xl font-bold text-white mb-4">Vérification KYC</h1>
+              <p className="text-gray-300">
                 Veuillez connecter votre portefeuille pour soumettre une demande KYC.
               </p>
             </div>
@@ -65,25 +65,25 @@ export default function KYCPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">Vérification KYC</h1>
+          <div className="bg-gradient-to-br from-blue-900/40 via-cyan-900/30 to-blue-800/40 backdrop-blur-md rounded-lg border border-blue-500/20 p-8">
+            <h1 className="text-3xl font-bold text-white mb-6">Vérification KYC</h1>
           
           {/* Current Status */}
-          <div className="mb-8 p-6 bg-gray-50 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Statut actuel</h2>
+          <div className="mb-8 p-6 bg-white/5 rounded-lg border border-white/10">
+            <h2 className="text-xl font-semibold mb-4 text-white">Statut actuel</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-700">Adresse:</span>
-                <span className="font-mono text-sm">{address}</span>
+                <span className="text-gray-300">Adresse:</span>
+                <span className="font-mono text-sm text-gray-400">{address}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-700">Statut KYC:</span>
+                <span className="text-gray-300">Statut KYC:</span>
                 {isLoading ? (
-                  <span className="text-gray-500">Chargement...</span>
+                  <span className="text-gray-400">Chargement...</span>
                 ) : (
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(kycStatus)}`}>
                     {getStatusDisplay(kycStatus)}
@@ -92,24 +92,24 @@ export default function KYCPage() {
               </div>
               {kycData && kycData.approvalDate > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Date d'approbation:</span>
-                  <span className="text-gray-900">
+                  <span className="text-gray-300">Date d'approbation:</span>
+                  <span className="text-white">
                     {new Date(Number(kycData.approvalDate) * 1000).toLocaleDateString('fr-FR')}
                   </span>
                 </div>
               )}
               {kycData && kycData.expiryDate > 0 && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700">Date d'expiration:</span>
-                  <span className="text-gray-900">
+                  <span className="text-gray-300">Date d'expiration:</span>
+                  <span className="text-white">
                     {new Date(Number(kycData.expiryDate) * 1000).toLocaleDateString('fr-FR')}
                   </span>
                 </div>
               )}
               {kycData && kycData.dataURI && (
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-700">URI de données:</span>
-                  <span className="font-mono text-sm text-blue-600 truncate max-w-xs">
+                  <span className="text-gray-300">URI de données:</span>
+                  <span className="font-mono text-sm text-blue-400 truncate max-w-xs">
                     {kycData.dataURI}
                   </span>
                 </div>
@@ -119,29 +119,29 @@ export default function KYCPage() {
 
           {/* Status Messages */}
           {kycStatus === 1 && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-yellow-800">
+            <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
+              <p className="text-yellow-300">
                 ⏳ Votre demande KYC est en cours de révision. Vous serez notifié une fois qu'elle sera traitée.
               </p>
             </div>
           )}
           {kycStatus === 2 && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800">
+            <div className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <p className="text-green-300">
                 ✅ Votre KYC est approuvé! Vous pouvez maintenant utiliser tous les services de la plateforme.
               </p>
             </div>
           )}
           {kycStatus === 3 && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">
+            <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <p className="text-red-300">
                 ❌ Votre demande KYC a été rejetée. Vous pouvez soumettre une nouvelle demande avec des informations mises à jour.
               </p>
             </div>
           )}
           {kycStatus === 4 && (
-            <div className="mb-6 p-4 bg-red-100 border border-red-300 rounded-lg">
-              <p className="text-red-900">
+            <div className="mb-6 p-4 bg-red-500/30 border border-red-500/40 rounded-lg">
+              <p className="text-red-200">
                 🚫 Votre adresse est sur liste noire. Veuillez contacter l'administrateur.
               </p>
             </div>
@@ -150,16 +150,16 @@ export default function KYCPage() {
           {/* Submit Form */}
           {(kycStatus === 0 || kycStatus === 3) && (
             <div className="space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="font-semibold text-blue-900 mb-3">📋 Demande de vérification</h3>
-                <p className="text-sm text-blue-800 mb-4">
+              <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-300 mb-3">📋 Demande de vérification</h3>
+                <p className="text-sm text-blue-200 mb-4">
                   Cliquez sur le bouton ci-dessous pour soumettre une demande de vérification KYC pour votre adresse.
                 </p>
-                <div className="bg-white rounded-lg p-3 mb-4">
-                  <p className="text-xs text-gray-500">Votre adresse :</p>
-                  <p className="font-mono text-sm text-gray-900 break-all">{address}</p>
+                <div className="bg-white/5 rounded-lg p-3 mb-4 border border-white/10">
+                  <p className="text-xs text-gray-400">Votre adresse :</p>
+                  <p className="font-mono text-sm text-white break-all">{address}</p>
                 </div>
-                <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+                <ul className="text-sm text-blue-200 space-y-1 list-disc list-inside">
                   <li>La vérification sera effectuée pour l'adresse connectée</li>
                   <li>La révision peut prendre quelques heures à quelques jours</li>
                   <li>Vous serez notifié une fois la demande traitée</li>
@@ -171,8 +171,8 @@ export default function KYCPage() {
                 disabled={submitting}
                 className={`w-full py-4 px-6 rounded-lg font-semibold text-white transition-colors ${
                   submitting
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl'
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                    : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
                 {submitting ? (
@@ -191,13 +191,13 @@ export default function KYCPage() {
           )}
 
           {/* Info Section */}
-          <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-3">Qu'est-ce que le KYC?</h3>
-            <p className="text-gray-600 text-sm mb-3">
+          <div className="mt-8 p-6 bg-white/5 rounded-lg border border-white/10">
+            <h3 className="font-semibold text-white mb-3">Qu'est-ce que le KYC?</h3>
+            <p className="text-gray-300 text-sm mb-3">
               Le KYC (Know Your Customer) est un processus de vérification d'identité requis pour utiliser
               les smart contracts et les fonctionnalités de trading sur notre plateforme.
             </p>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-300 text-sm">
               Une fois votre KYC approuvé, vous pourrez créer des tokens, trader sur le DEX, et accéder
               à toutes les fonctionnalités de la plateforme.
             </p>

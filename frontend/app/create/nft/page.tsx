@@ -224,13 +224,13 @@ export default function CreateNFTPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl p-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Créer des NFTs</h1>
-              <p className="text-gray-600">Veuillez connecter votre portefeuille pour continuer.</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-8 text-center">
+              <h1 className="text-3xl font-bold text-white mb-4">Créer des NFTs</h1>
+              <p className="text-gray-300">Veuillez connecter votre portefeuille pour continuer.</p>
             </div>
           </div>
         </div>
@@ -239,36 +239,36 @@ export default function CreateNFTPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8">
+          <div className="bg-gradient-to-br from-purple-900/40 via-pink-900/30 to-purple-800/40 backdrop-blur-md rounded-lg border border-purple-500/20 p-8">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-gray-900">Créer des NFTs</h1>
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+              <h1 className="text-3xl font-bold text-white">Créer des NFTs</h1>
+              <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-semibold border border-green-500/30">
                 🚀 Optimisé
               </span>
             </div>
-          <p className="text-gray-600 mb-8">Mint direct ou avec IPFS pour métadonnées volumineuses</p>
+          <p className="text-gray-300 mb-8">Mint direct ou avec IPFS pour métadonnées volumineuses</p>
 
           {/* Collection Information */}
-          <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <div className="mb-8 p-6 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-lg border border-blue-500/30">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
               <span>🎨</span> Collection
             </h2>
             
             {loadingInfo ? (
-              <p className="text-gray-600">Chargement...</p>
+              <p className="text-gray-300">Chargement...</p>
             ) : collectionInfo ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Nom</p>
-                  <p className="font-semibold text-lg">{collectionInfo.name}</p>
+                  <p className="text-sm text-gray-400">Nom</p>
+                  <p className="font-semibold text-lg text-white">{collectionInfo.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">NFTs Créés</p>
-                  <p className="font-semibold text-green-600">{collectionInfo.totalSupply}</p>
+                  <p className="text-sm text-gray-400">NFTs Créés</p>
+                  <p className="font-semibold text-green-400">{collectionInfo.totalSupply}</p>
                 </div>
               </div>
             ) : (
@@ -279,18 +279,18 @@ export default function CreateNFTPage() {
           </div>
 
           {/* Mint Form */}
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h2 className="text-xl font-semibold mb-4">✨ Minter un NFT</h2>
+          <div className="bg-white/5 p-6 rounded-lg border border-white/10">
+            <h2 className="text-xl font-semibold mb-4 text-white">✨ Minter un NFT</h2>
 
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="mb-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+              <p className="text-sm text-blue-200">
                 <strong>ℹ️</strong> Le destinataire doit avoir un KYC approuvé.
               </p>
             </div>
 
             <form onSubmit={handleMintNFT} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Adresse du destinataire *
                 </label>
                 <input
@@ -298,15 +298,15 @@ export default function CreateNFTPage() {
                   value={mintTo}
                   onChange={(e) => setMintTo(e.target.value)}
                   placeholder="0x..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white placeholder-gray-500"
                   disabled={loading}
                   required
                 />
               </div>
 
               {/* Mode Toggle */}
-              <div className="border-t pt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+              <div className="border-t border-white/10 pt-4">
+                <label className="block text-sm font-medium text-gray-300 mb-3">
                   Mode *
                 </label>
                 <div className="flex gap-4 mb-4">
@@ -315,8 +315,8 @@ export default function CreateNFTPage() {
                     onClick={() => setMetadataMode('manual')}
                     className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
                       metadataMode === 'manual'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                     disabled={loading}
                   >
@@ -327,8 +327,8 @@ export default function CreateNFTPage() {
                     onClick={() => setMetadataMode('uri')}
                     className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
                       metadataMode === 'uri'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
                     }`}
                     disabled={loading}
                   >
@@ -339,50 +339,50 @@ export default function CreateNFTPage() {
 
               {/* Manual Mode */}
               {metadataMode === 'manual' && (
-                <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                  <div className="bg-blue-50 border border-blue-300 rounded-lg p-3">
-                    <p className="text-sm text-blue-800 font-semibold">💡 Mint Direct</p>
-                    <p className="text-xs text-blue-700 mt-1">
+                <div className="space-y-4 p-4 bg-purple-500/20 rounded-lg border border-purple-500/30">
+                  <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3">
+                    <p className="text-sm text-blue-300 font-semibold">💡 Mint Direct</p>
+                    <p className="text-xs text-blue-200 mt-1">
                       ✅ Champs obligatoires: <strong>Nom, Description, Image, Prix</strong>
                     </p>
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-xs text-blue-200 mt-1">
                       Optionnel: Certificat, Attributs
                     </p>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Nom de l'actif <span className="text-red-600">*</span>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nom de l'actif <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="text"
                       value={assetName}
                       onChange={(e) => setAssetName(e.target.value)}
                       placeholder="Diamond 2.5ct D IF"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       disabled={loading}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description <span className="text-red-600">*</span>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Description <span className="text-red-400">*</span>
                     </label>
                     <textarea
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Description de l'actif..."
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       disabled={loading}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Valorisation EUR <span className="text-red-600">*</span>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Valorisation EUR <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="number"
@@ -391,32 +391,32 @@ export default function CreateNFTPage() {
                       placeholder="50000"
                       step="0.01"
                       min="0.01"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       disabled={loading}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Image URL <span className="text-red-600">*</span>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Image URL <span className="text-red-400">*</span>
                     </label>
                     <input
                       type="text"
                       value={imageURI}
                       onChange={(e) => setImageURI(e.target.value)}
                       placeholder="ipfs://... ou https://i.imgur.com/xxx.png"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       disabled={loading}
                       required
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-400 mt-1">
                       💡 Utilisez une URL publique (Imgur, IPFS, etc.)
                     </p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Certificat URI (optionnel)
                     </label>
                     <input
@@ -424,13 +424,13 @@ export default function CreateNFTPage() {
                       value={certificateURI}
                       onChange={(e) => setCertificateURI(e.target.value)}
                       placeholder="ipfs://..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                       disabled={loading}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
                       Attributs (optionnel)
                     </label>
                     <div className="space-y-2">
@@ -441,7 +441,7 @@ export default function CreateNFTPage() {
                             value={attr.trait_type}
                             onChange={(e) => updateAttribute(index, 'trait_type', e.target.value)}
                             placeholder="Type"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500"
                             disabled={loading}
                           />
                           <input
@@ -449,14 +449,14 @@ export default function CreateNFTPage() {
                             value={attr.value}
                             onChange={(e) => updateAttribute(index, 'value', e.target.value)}
                             placeholder="Valeur"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder-gray-500"
                             disabled={loading}
                           />
                           {attributes.length > 1 && (
                             <button
                               type="button"
                               onClick={() => removeAttribute(index)}
-                              className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-sm"
+                              className="px-3 py-2 bg-red-500/20 text-red-300 rounded-lg hover:bg-red-500/30 text-sm"
                               disabled={loading}
                             >
                               ✕
@@ -467,7 +467,7 @@ export default function CreateNFTPage() {
                       <button
                         type="button"
                         onClick={addAttribute}
-                        className="w-full py-2 px-4 border-2 border-dashed border-green-300 text-green-600 rounded-lg hover:bg-green-50 text-sm font-medium"
+                        className="w-full py-2 px-4 border-2 border-dashed border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/10 text-sm font-medium"
                         disabled={loading}
                       >
                         + Ajouter
@@ -480,7 +480,7 @@ export default function CreateNFTPage() {
               {/* URI Mode */}
               {metadataMode === 'uri' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     URI IPFS *
                   </label>
                   <input
@@ -488,7 +488,7 @@ export default function CreateNFTPage() {
                     value={metadataURI}
                     onChange={(e) => setMetadataURI(e.target.value)}
                     placeholder="ipfs://..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500"
                     disabled={loading}
                     required
                   />
@@ -504,8 +504,8 @@ export default function CreateNFTPage() {
                   loading || !mintTo ||
                   (metadataMode === 'manual' && (!assetName || !description)) ||
                   (metadataMode === 'uri' && !metadataURI)
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700'
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                    : 'bg-purple-600 hover:bg-purple-700'
                 }`}
               >
                 {loading ? 'Minting...' : '✨ Minter le NFT'}

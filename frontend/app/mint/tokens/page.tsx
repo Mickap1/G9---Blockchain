@@ -160,13 +160,13 @@ export default function MintTokensPage() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-xl p-8 text-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">🪙 Minter des Tokens</h1>
-              <p className="text-gray-600">Veuillez connecter votre portefeuille pour continuer.</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 p-8 text-center">
+              <h1 className="text-3xl font-bold text-white mb-4">🪙 Minter des Tokens</h1>
+              <p className="text-gray-300">Veuillez connecter votre portefeuille pour continuer.</p>
             </div>
           </div>
         </div>
@@ -175,59 +175,59 @@ export default function MintTokensPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 backdrop-blur-md rounded-lg border border-green-500/20 p-8">
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
               <span>🪙</span> Minter des Tokens Fungibles
             </h1>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-300 mb-8">
               Émission de nouveaux tokens représentant des parts d'actifs fractionnés
             </p>
 
             {/* Admin Permission Warning */}
             {checkingRole ? (
-              <div className="mb-6 p-4 bg-gray-100 border border-gray-300 rounded-lg">
-                <p className="text-gray-600">🔍 Vérification des permissions...</p>
+              <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-lg">
+                <p className="text-gray-300">🔍 Vérification des permissions...</p>
               </div>
             ) : !hasAdminRole ? (
-              <div className="mb-6 p-6 bg-red-50 border-2 border-red-300 rounded-lg">
+              <div className="mb-6 p-6 bg-red-500/20 border-2 border-red-500/30 rounded-lg">
                 <div className="flex items-start gap-3">
                   <span className="text-3xl">🔒</span>
                   <div>
-                    <h3 className="text-lg font-bold text-red-800 mb-2">
+                    <h3 className="text-lg font-bold text-red-300 mb-2">
                       Accès Réservé aux Administrateurs
                     </h3>
-                    <p className="text-red-700 mb-3">
+                    <p className="text-red-200 mb-3">
                       Vous n'avez pas les permissions nécessaires pour minter des tokens.
                     </p>
-                    <div className="bg-red-100 p-3 rounded border border-red-200">
-                      <p className="text-sm text-red-800 font-semibold mb-1">
+                    <div className="bg-red-500/30 p-3 rounded border border-red-500/40">
+                      <p className="text-sm text-red-200 font-semibold mb-1">
                         ⚠️ Permissions requises :
                       </p>
-                      <ul className="text-sm text-red-700 list-disc list-inside space-y-1">
-                        <li>Vous devez avoir le rôle <code className="bg-red-200 px-1 rounded">MINTER_ROLE</code></li>
+                      <ul className="text-sm text-red-100 list-disc list-inside space-y-1">
+                        <li>Vous devez avoir le rôle <code className="bg-red-500/40 px-1 rounded">MINTER_ROLE</code></li>
                         <li>Seuls les administrateurs autorisés peuvent créer de nouveaux tokens</li>
                         <li>Cette restriction protège l'intégrité du supply total des tokens</li>
                       </ul>
                     </div>
-                    <p className="text-sm text-red-600 mt-3">
+                    <p className="text-sm text-red-300 mt-3">
                       💡 Contactez un administrateur du système pour obtenir les permissions nécessaires.
                     </p>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="mb-6 p-4 bg-green-50 border-2 border-green-300 rounded-lg">
+              <div className="mb-6 p-4 bg-green-500/20 border-2 border-green-500/30 rounded-lg">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">✅</span>
                   <div>
-                    <p className="font-semibold text-green-800">
+                    <p className="font-semibold text-green-300">
                       Vous avez les permissions administrateur
                     </p>
-                    <p className="text-sm text-green-700">
+                    <p className="text-sm text-green-200">
                       Rôle MINTER_ROLE détecté - Vous pouvez minter des tokens
                     </p>
                   </div>
@@ -236,38 +236,38 @@ export default function MintTokensPage() {
             )}
 
             {/* Token Information */}
-            <div className="mb-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className="mb-8 p-6 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-lg border border-green-500/30">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
                 <span>📊</span> Informations du Token
               </h2>
               
               {loadingInfo ? (
-                <p className="text-gray-600">Chargement...</p>
+                <p className="text-gray-300">Chargement...</p>
               ) : tokenInfo ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">Nom</p>
-                    <p className="font-semibold text-lg">{tokenInfo.name}</p>
+                    <p className="text-sm text-gray-400">Nom</p>
+                    <p className="font-semibold text-lg text-white">{tokenInfo.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Symbole</p>
-                    <p className="font-semibold text-lg">{tokenInfo.symbol}</p>
+                    <p className="text-sm text-gray-400">Symbole</p>
+                    <p className="font-semibold text-lg text-white">{tokenInfo.symbol}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Supply Total</p>
-                    <p className="font-semibold">
+                    <p className="text-sm text-gray-400">Supply Total</p>
+                    <p className="font-semibold text-white">
                       {(Number(tokenInfo.totalSupply) / 10**Number(tokenInfo.decimals)).toLocaleString()} / {(Number(tokenInfo.maxSupply) / 10**Number(tokenInfo.decimals)).toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Supply Restant</p>
-                    <p className="font-semibold text-green-600">
+                    <p className="text-sm text-gray-400">Supply Restant</p>
+                    <p className="font-semibold text-green-400">
                       {(Number(tokenInfo.remaining) / 10**Number(tokenInfo.decimals)).toLocaleString()}
                     </p>
                   </div>
                   <div className="md:col-span-2">
-                    <p className="text-sm text-gray-600">Actif Sous-jacent</p>
-                    <p className="font-semibold">{tokenInfo.metadata.assetName}</p>
+                    <p className="text-sm text-gray-400">Actif Sous-jacent</p>
+                    <p className="font-semibold text-white">{tokenInfo.metadata.assetName}</p>
                     <p className="text-sm text-gray-500">{tokenInfo.metadata.assetType} - {tokenInfo.metadata.location}</p>
                   </div>
                   <div>
@@ -296,20 +296,20 @@ export default function MintTokensPage() {
             </div>
 
             {/* Mint Form */}
-            <div className={`bg-gray-50 p-6 rounded-lg border ${hasAdminRole ? 'border-gray-200' : 'border-gray-300 opacity-60'}`}>
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <div className={`bg-white/5 p-6 rounded-lg border ${hasAdminRole ? 'border-white/10' : 'border-white/5 opacity-60'}`}>
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
                 <span>🔨</span> Formulaire de Mint
               </h2>
 
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div className="mb-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+                <p className="text-sm text-blue-200">
                   <strong>ℹ️ Important:</strong> Le destinataire doit avoir un KYC approuvé pour recevoir des tokens.
                 </p>
               </div>
 
               <form onSubmit={handleMint} className="space-y-4">
                 <div>
-                  <label htmlFor="mintAddress" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="mintAddress" className="block text-sm font-medium text-gray-300 mb-2">
                     Adresse du destinataire
                   </label>
                   <input
@@ -318,13 +318,13 @@ export default function MintTokensPage() {
                     value={mintAddress}
                     onChange={(e) => setMintAddress(e.target.value)}
                     placeholder="0x..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white placeholder-gray-500"
                     disabled={loading || !hasAdminRole}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="mintAmount" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="mintAmount" className="block text-sm font-medium text-gray-300 mb-2">
                     Quantité de tokens
                   </label>
                   <input
@@ -334,11 +334,11 @@ export default function MintTokensPage() {
                     onChange={(e) => setMintAmount(e.target.value)}
                     placeholder="100"
                     step="0.000000000000000001"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white placeholder-gray-500"
                     disabled={loading || !hasAdminRole}
                   />
                   {tokenInfo && (
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-400">
                       Maximum disponible: {(Number(tokenInfo.remaining) / 10**Number(tokenInfo.decimals)).toLocaleString()} {tokenInfo.symbol}
                     </p>
                   )}
@@ -349,7 +349,7 @@ export default function MintTokensPage() {
                   disabled={loading || !mintAddress || !mintAmount || !hasAdminRole}
                   className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
                     loading || !mintAddress || !mintAmount || !hasAdminRole
-                      ? 'bg-gray-400 cursor-not-allowed'
+                      ? 'bg-gray-600 cursor-not-allowed opacity-50'
                       : 'bg-green-600 hover:bg-green-700'
                   }`}
                 >
@@ -359,13 +359,13 @@ export default function MintTokensPage() {
             </div>
 
             {/* Additional Info */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <div className="mt-8 p-6 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-500/30">
+              <h3 className="font-semibold text-white mb-3 flex items-center gap-2">
                 <span>📚</span> À propos du Minting
               </h3>
-              <ul className="text-sm text-gray-700 space-y-2">
+              <ul className="text-sm text-gray-300 space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-400 font-bold">✓</span>
                   <span><strong>Tokens Fungibles ERC-20 :</strong> Représentent des parts fractionnées d'un actif réel</span>
                 </li>
                 <li className="flex items-start gap-2">
@@ -373,19 +373,19 @@ export default function MintTokensPage() {
                   <span><strong>Supply Limité :</strong> Le nombre maximum de tokens est fixé à la création du contrat</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-400 font-bold">✓</span>
                   <span><strong>KYC Obligatoire :</strong> Tous les transferts nécessitent une vérification KYC approuvée</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 font-bold">⚠</span>
+                  <span className="text-red-400 font-bold">⚠</span>
                   <span><strong>Permissions Admin :</strong> Seuls les comptes avec le rôle MINTER_ROLE peuvent créer de nouveaux tokens</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-400 font-bold">✓</span>
                   <span><strong>Trading :</strong> Les tokens peuvent être échangés sur le DEX une fois mintés</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-400 font-bold">✓</span>
                   <span><strong>Propriété :</strong> Posséder X% des tokens = posséder X% de l'actif sous-jacent</span>
                 </li>
               </ul>
