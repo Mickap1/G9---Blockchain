@@ -85,10 +85,60 @@ async function updateNFTPrice(
 }
 
 /**
+ * Récupérer la valuation depuis les métadonnées du NFT
+ */
+async function getValuationFromMetadata(nft: any, tokenId: number): Promise<bigint | null> {
+  try {
+    // Récupérer le tokenURI
+    const tokenURI = await nft.tokenURI(tokenId);
+    
+    // Si c'est une data URI, la décoder
+    let metadataJSON: string;
+    
+    if (tokenURI.startsWith('data:application/json;base64,')) {
+      const base64Data = tokenURI.replace('data:application/json;base64,', '');
+      metadataJSON = Buffer.from(base64Data, 'base64').toString('utf-8');
+    } else if (tokenURI.startsWith('ipfs://')) {
+      // Pour IPFS, on pourrait faire un fetch mais pour l'instant on retourne null
+      console.log("     ⚠️  IPFS URI détecté, impossible de récupérer la valuation automatiquement");
+      return null;
+    } else {
+      // Essayer de fetch l'URI directement
+      try {
+        const response = await fetch(tokenURI);
+        metadataJSON = await response.text();
+      } catch {
+        return null;
+      }
+    }
+    
+    // Parser le JSON
+    const metadata = JSON.parse(metadataJSON);
+    
+    // Extraire la valuation
+    if (metadata.valuation) {
+      const valuationStr = typeof metadata.valuation === 'string' 
+        ? metadata.valuation 
+        : metadata.valuation.toString();
+      
+      // La valuation peut être stockée en ETH ou en nombre
+      // On suppose qu'elle est en EUR (nombre simple)
+      return ethers.parseEther(valuationStr);
+    }
+    
+    return null;
+  } catch (error) {
+    console.log("     ⚠️  Impossible de récupérer la valuation depuis les métadonnées");
+    return null;
+  }
+}
+
+/**
  * Récupérer ou initialiser le prix d'un NFT
  */
 async function getOrInitNFTPrice(
   oracle: any,
+  nft: any,
   nftAddress: string,
   tokenId: number
 ): Promise<bigint> {
@@ -101,19 +151,27 @@ async function getOrInitNFTPrice(
     // Prix non défini
   }
   
-  // Initialiser avec le prix par défaut
-  const defaultPrice = ethers.parseEther(DEFAULT_NFT_PRICE);
-  console.log("     ℹ️  Initialisation du prix:", ethers.formatEther(defaultPrice), "EUR");
+  // Essayer de récupérer la valuation depuis les métadonnées
+  console.log("     ℹ️  Récupération de la valuation depuis les métadonnées...");
+  const valuationFromMetadata = await getValuationFromMetadata(nft, tokenId);
+  
+  const initialPrice = valuationFromMetadata || ethers.parseEther(DEFAULT_NFT_PRICE);
+  
+  if (valuationFromMetadata) {
+    console.log("     ✅ Valuation trouvée:", ethers.formatEther(valuationFromMetadata), "EUR");
+  } else {
+    console.log("     ⚠️  Valuation non trouvée, utilisation du prix par défaut:", ethers.formatEther(initialPrice), "EUR");
+  }
   
   try {
-    const tx = await oracle.updateNFTPrice(nftAddress, tokenId, defaultPrice);
+    const tx = await oracle.updateNFTPrice(nftAddress, tokenId, initialPrice);
     await tx.wait();
     console.log("     ✅ Prix initial défini!");
   } catch (error: any) {
     console.error("     ⚠️  Erreur d'initialisation:", error.message);
   }
   
-  return defaultPrice;
+  return initialPrice;
 }
 
 /**
@@ -152,7 +210,7 @@ async function updateAllNFTs(oracle: any, nft: any, nftAddress: string) {
       await nft.ownerOf(tokenId);
       
       // Récupérer ou initialiser le prix
-      const currentPrice = await getOrInitNFTPrice(oracle, nftAddress, tokenId);
+      const currentPrice = await getOrInitNFTPrice(oracle, nft, nftAddress, tokenId);
       
       // Mettre à jour le prix
       await updateNFTPrice(oracle, nftAddress, tokenId, currentPrice);

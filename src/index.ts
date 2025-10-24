@@ -7,6 +7,7 @@ import { connectDatabase, disconnectDatabase } from "./config/database";
 import { initializeIndexer, indexNewEvents } from "./services/eventListener";
 import { logger } from "./utils/logger";
 import apiRoutes from "./api/routes";
+import { CONTRACTS } from "./config/contracts";
 
 // Charger le .env depuis le dossier indexer/ (fonctionne en dev et après compilation)
 const envPath = path.resolve(__dirname, "../../indexer/.env");
@@ -27,7 +28,15 @@ app.use("/api", apiRoutes);
 // Fonction principale
 async function main() {
   try {
-    logger.info("🚀 Starting RWA Indexer...");
+    logger.info("🚀 Starting RWA Indexer v2.0 (with correct contract addresses)...");
+    
+    // Afficher les adresses des contrats pour debugging
+    logger.info("📋 Contract Addresses:");
+    logger.info(`   DEX: ${CONTRACTS.dex}`);
+    logger.info(`   Fungible Token: ${CONTRACTS.fungibleToken}`);
+    logger.info(`   NFT Token: ${CONTRACTS.nftToken}`);
+    logger.info(`   Oracle: ${CONTRACTS.oracle}`);
+    logger.info(`   KYC Registry: ${CONTRACTS.kycRegistry}`);
 
     // Connexion à la base de données
     await connectDatabase();

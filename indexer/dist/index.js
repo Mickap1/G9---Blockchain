@@ -12,6 +12,7 @@ const database_1 = require("./config/database");
 const eventListener_1 = require("./services/eventListener");
 const logger_1 = require("./utils/logger");
 const routes_1 = __importDefault(require("./api/routes"));
+const contracts_1 = require("./config/contracts");
 // Charger le .env depuis le dossier indexer/ (fonctionne en dev et après compilation)
 const envPath = path_1.default.resolve(__dirname, "../../indexer/.env");
 dotenv_1.default.config({ path: envPath });
@@ -27,7 +28,14 @@ app.use("/api", routes_1.default);
 // Fonction principale
 async function main() {
     try {
-        logger_1.logger.info("🚀 Starting RWA Indexer...");
+        logger_1.logger.info("🚀 Starting RWA Indexer v2.0 (with correct contract addresses)...");
+        // Afficher les adresses des contrats pour debugging
+        logger_1.logger.info("📋 Contract Addresses:");
+        logger_1.logger.info(`   DEX: ${contracts_1.CONTRACTS.dex}`);
+        logger_1.logger.info(`   Fungible Token: ${contracts_1.CONTRACTS.fungibleToken}`);
+        logger_1.logger.info(`   NFT Token: ${contracts_1.CONTRACTS.nftToken}`);
+        logger_1.logger.info(`   Oracle: ${contracts_1.CONTRACTS.oracle}`);
+        logger_1.logger.info(`   KYC Registry: ${contracts_1.CONTRACTS.kycRegistry}`);
         // Connexion à la base de données
         await (0, database_1.connectDatabase)();
         // Initialiser l'indexer

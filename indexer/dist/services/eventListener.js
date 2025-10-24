@@ -17,9 +17,9 @@ async function initializeIndexer() {
         logger_1.logger.info(`📍 Resuming from block ${lastIndexedBlock}`);
     }
     else {
-        // Commencer il y a 1000 blocs (environ 3h30 sur Sepolia)
+        // Commencer il y a 2000 blocs (environ 7 heures sur Sepolia)
         const currentBlock = await contracts_1.provider.getBlockNumber();
-        lastIndexedBlock = currentBlock - 1000;
+        lastIndexedBlock = currentBlock - 2000;
         logger_1.logger.info(`🆕 Starting fresh from block ${lastIndexedBlock}`);
     }
 }
