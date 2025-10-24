@@ -8,21 +8,20 @@ import { Header } from '@/components/Header';
 export default function KYCPage() {
   const { address, isConnected } = useAccount();
   const { kycStatus, kycData, submitKYC, isLoading } = useKYC(address);
-  const [dataURI, setDataURI] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!dataURI.trim()) {
-      alert('Veuillez entrer une URI de données KYC');
+  const handleSubmit = async () => {
+    if (!address) {
+      alert('Veuillez connecter votre portefeuille');
       return;
     }
 
     try {
       setSubmitting(true);
-      await submitKYC(dataURI);
-      alert('Demande KYC soumise avec succès!');
-      setDataURI('');
+      // Use a default URI with the user's address
+      const defaultURI = `kyc-request-${address}-${Date.now()}`;
+      await submitKYC(defaultURI);
+      alert('Demande de vérification KYC soumise avec succès!');
     } catch (error: any) {
       console.error('Erreur lors de la soumission KYC:', error);
       alert(`Erreur: ${error.message || 'Échec de la soumission'}`);
@@ -150,47 +149,45 @@ export default function KYCPage() {
 
           {/* Submit Form */}
           {(kycStatus === 0 || kycStatus === 3) && (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="dataURI" className="block text-sm font-medium text-gray-700 mb-2">
-                  URI de données KYC
-                </label>
-                <p className="text-sm text-gray-500 mb-3">
-                  Entrez l'URI de vos documents KYC (hash IPFS, lien vers documents chiffrés, etc.)
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-900 mb-3">📋 Demande de vérification</h3>
+                <p className="text-sm text-blue-800 mb-4">
+                  Cliquez sur le bouton ci-dessous pour soumettre une demande de vérification KYC pour votre adresse.
                 </p>
-                <input
-                  type="text"
-                  id="dataURI"
-                  value={dataURI}
-                  onChange={(e) => setDataURI(e.target.value)}
-                  placeholder="ipfs://... ou https://..."
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  disabled={submitting}
-                />
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">ℹ️ Informations importantes</h3>
+                <div className="bg-white rounded-lg p-3 mb-4">
+                  <p className="text-xs text-gray-500">Votre adresse :</p>
+                  <p className="font-mono text-sm text-gray-900 break-all">{address}</p>
+                </div>
                 <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-                  <li>Vos documents KYC doivent être stockés de manière sécurisée</li>
-                  <li>L'URI doit pointer vers des documents valides et accessibles</li>
+                  <li>La vérification sera effectuée pour l'adresse connectée</li>
                   <li>La révision peut prendre quelques heures à quelques jours</li>
-                  <li>Assurez-vous que toutes les informations sont correctes avant de soumettre</li>
+                  <li>Vous serez notifié une fois la demande traitée</li>
                 </ul>
               </div>
 
               <button
-                type="submit"
-                disabled={submitting || !dataURI.trim()}
-                className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-colors ${
-                  submitting || !dataURI.trim()
+                onClick={handleSubmit}
+                disabled={submitting}
+                className={`w-full py-4 px-6 rounded-lg font-semibold text-white transition-colors ${
+                  submitting
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl'
                 }`}
               >
-                {submitting ? 'Soumission en cours...' : 'Soumettre la demande KYC'}
+                {submitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Soumission en cours...
+                  </span>
+                ) : (
+                  '✅ Soumettre une demande de vérification KYC'
+                )}
               </button>
-            </form>
+            </div>
           )}
 
           {/* Info Section */}

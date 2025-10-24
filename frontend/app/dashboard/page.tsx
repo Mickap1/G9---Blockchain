@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useAccount, usePublicClient, useBalance } from 'wagmi';
-import { formatUnits } from 'viem';
+import { formatUnits, formatEther } from 'viem';
 import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
 import NFTTokenV2ABI from '@/lib/abis/NFTAssetTokenV2.json';
+import SimpleDEXABI from '@/lib/abis/SimpleDEX.json';
 import { Header } from '@/components/Header';
 
 const FUNGIBLE_TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f';
 const NFT_TOKEN_ADDRESS = '0xf16b0641A9C56C6db30E052E90DB9358b6D2C946';
+const DEX_ADDRESS = '0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98';
 
 interface NFTData {
   tokenId: number;
@@ -16,6 +18,26 @@ interface NFTData {
   isActive: boolean;
   uri: string;
   metadata?: any;
+}
+
+interface FungibleTokenInfo {
+  name: any;
+  symbol: any;
+  assetType: string;
+  totalValue: number;
+  assetName: string;
+  location: string;
+  documentURI: string;
+  tokenizationDate: number;
+  maxSupply: number;
+}
+
+interface LiquidityPosition {
+  lpTokens: string;
+  sharePercent: number;
+  tokenValue: string;
+  ethValue: string;
+  totalValueETH: string;
 }
 
 export default function DashboardPage() {
@@ -29,10 +51,11 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [fungibleBalance, setFungibleBalance] = useState('0');
-  const [fungibleTokenInfo, setFungibleTokenInfo] = useState<any>(null);
+  const [fungibleTokenInfo, setFungibleTokenInfo] = useState<FungibleTokenInfo | null>(null);
   const [nfts, setNfts] = useState<NFTData[]>([]);
   const [totalValue, setTotalValue] = useState(0);
   const [ethPriceEUR, setEthPriceEUR] = useState(0);
+  const [liquidityPosition, setLiquidityPosition] = useState<LiquidityPosition | null>(null);
 
   // Fetch ETH price in EUR
   const fetchEthPrice = async () => {
@@ -76,17 +99,29 @@ export default function DashboardPage() {
         }),
       ]);
 
-      // Try to get asset metadata (struct)
+      // Try to get asset metadata (struct) and max supply
       let assetMetadata: any = null;
       let totalValue = 0;
+      let maxSupply = 0;
       try {
-        assetMetadata = await publicClient.readContract({
-          address: FUNGIBLE_TOKEN_ADDRESS,
-          abi: FungibleTokenABI,
-          functionName: 'assetMetadata',
-        }) as any;
+        const [metadata, supply] = await Promise.all([
+          publicClient.readContract({
+            address: FUNGIBLE_TOKEN_ADDRESS,
+            abi: FungibleTokenABI,
+            functionName: 'assetMetadata',
+          }),
+          publicClient.readContract({
+            address: FUNGIBLE_TOKEN_ADDRESS,
+            abi: FungibleTokenABI,
+            functionName: 'MAX_SUPPLY',
+          }),
+        ]);
+        
+        assetMetadata = metadata as any;
+        maxSupply = Number(formatUnits(supply as bigint, decimals as number));
+        
         if (assetMetadata && assetMetadata.totalValue) {
-          totalValue = Number(assetMetadata.totalValue) / 100; // Convert from cents
+          totalValue = Number(assetMetadata.totalValue);
         }
       } catch (e) {
         console.log('Could not load assetMetadata, using default values');
@@ -94,12 +129,23 @@ export default function DashboardPage() {
 
       const balanceFormatted = formatUnits(balance as bigint, decimals as number);
       setFungibleBalance(balanceFormatted);
-      setFungibleTokenInfo({
+      
+      const tokenInfo = {
         name,
         symbol,
         assetType: assetMetadata?.assetType || 'Token',
         totalValue: totalValue,
-      });
+        assetName: assetMetadata?.assetName || '',
+        location: assetMetadata?.location || '',
+        documentURI: assetMetadata?.documentURI || '',
+        tokenizationDate: assetMetadata?.tokenizationDate ? Number(assetMetadata.tokenizationDate) : 0,
+        maxSupply: maxSupply,
+      };
+      
+      console.log('📊 Fungible Token Info:', tokenInfo);
+      console.log('📦 Asset Metadata:', assetMetadata);
+      
+      setFungibleTokenInfo(tokenInfo);
     } catch (error) {
       console.error('Error loading fungible token:', error);
     }
@@ -219,6 +265,53 @@ export default function DashboardPage() {
     }
   };
 
+  // Load Liquidity Position
+  const loadLiquidityPosition = async () => {
+    if (!publicClient || !address) return;
+
+    try {
+      // Get user's LP tokens
+      const lpTokens = await publicClient.readContract({
+        address: DEX_ADDRESS as `0x${string}`,
+        abi: SimpleDEXABI,
+        functionName: 'liquidity',
+        args: [address],
+      }) as bigint;
+
+      // Get pool info - retourne [reserveToken, reserveETH, totalLiquidity]
+      const poolInfo = await publicClient.readContract({
+        address: DEX_ADDRESS as `0x${string}`,
+        abi: SimpleDEXABI,
+        functionName: 'getPoolInfo',
+      }) as [bigint, bigint, bigint];
+
+      const lpBalance = parseFloat(formatEther(lpTokens));
+      const reserveToken = parseFloat(formatEther(poolInfo[0]));
+      const reserveETH = parseFloat(formatEther(poolInfo[1]));
+      const totalLiquidity = parseFloat(formatEther(poolInfo[2]));
+
+      if (lpBalance > 0 && totalLiquidity > 0) {
+        const sharePercent = (lpBalance / totalLiquidity) * 100;
+        const tokenValue = (reserveToken * sharePercent) / 100;
+        const ethValue = (reserveETH * sharePercent) / 100;
+        const totalValueETH = ethValue * 2; // Approximation de la valeur totale
+
+        setLiquidityPosition({
+          lpTokens: lpBalance.toFixed(6),
+          sharePercent: sharePercent,
+          tokenValue: tokenValue.toFixed(2),
+          ethValue: ethValue.toFixed(6),
+          totalValueETH: totalValueETH.toFixed(6),
+        });
+      } else {
+        setLiquidityPosition(null);
+      }
+    } catch (error) {
+      console.error('Error loading liquidity position:', error);
+      setLiquidityPosition(null);
+    }
+  };
+
   // Load all data
   const loadDashboard = async () => {
     setLoading(true);
@@ -226,6 +319,7 @@ export default function DashboardPage() {
       fetchEthPrice(),
       loadFungibleTokenInfo(),
       loadNFTs(),
+      loadLiquidityPosition(),
     ]);
     setLoading(false);
   };
@@ -307,6 +401,182 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Informations sur l'Actif Sous-Jacent */}
+            {fungibleTokenInfo && fungibleTokenInfo.maxSupply > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span>🏢</span> Actif Sous-Jacent
+                </h2>
+                <div className="bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 rounded-xl shadow-lg p-8 text-white">
+                  {/* En-tête de l'actif */}
+                  <div className="border-b border-white/30 pb-6 mb-6">
+                    <h3 className="text-3xl font-bold mb-2">
+                      {fungibleTokenInfo.assetName || fungibleTokenInfo.name}
+                    </h3>
+                    <div className="flex items-center gap-4 text-sm opacity-90">
+                      <span className="flex items-center gap-2">
+                        📍 {fungibleTokenInfo.location || 'Localisation non spécifiée'}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        🏷️ {fungibleTokenInfo.assetType}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Statistiques de l'actif */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
+                      <p className="text-sm opacity-80 mb-2">Valeur Totale de l'Actif</p>
+                      <p className="text-3xl font-bold mb-1">
+                        {fungibleTokenInfo.totalValue.toLocaleString('fr-FR')} €
+                      </p>
+                      <p className="text-xs opacity-70">
+                        Évaluation professionnelle
+                      </p>
+                    </div>
+
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
+                      <p className="text-sm opacity-80 mb-2">Tokens Totaux Émis</p>
+                      <p className="text-3xl font-bold mb-1">
+                        {fungibleTokenInfo.maxSupply.toLocaleString('fr-FR')}
+                      </p>
+                      <p className="text-xs opacity-70">
+                        {fungibleTokenInfo.symbol}
+                      </p>
+                    </div>
+
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg p-5">
+                      <p className="text-sm opacity-80 mb-2">Valeur par Token</p>
+                      <p className="text-3xl font-bold mb-1">
+                        {(fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply).toFixed(2)} €
+                      </p>
+                      <p className="text-xs opacity-70">
+                        Prix unitaire
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Votre participation */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-lg font-semibold mb-1">Votre Participation</p>
+                        <p className="text-sm opacity-80">
+                          Vous possédez <span className="font-bold">{parseFloat(fungibleBalance).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span> tokens
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm opacity-80 mb-1">Part de propriété</p>
+                        <p className="text-4xl font-bold">
+                          {((parseFloat(fungibleBalance) / fungibleTokenInfo.maxSupply) * 100).toFixed(4)}%
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="bg-white/10 rounded-lg p-4">
+                        <p className="text-xs opacity-70 mb-1">Valeur de vos tokens</p>
+                        <p className="text-2xl font-bold">
+                          {(parseFloat(fungibleBalance) * (fungibleTokenInfo.totalValue / fungibleTokenInfo.maxSupply)).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €
+                        </p>
+                      </div>
+                      <div className="bg-white/10 rounded-lg p-4">
+                        <p className="text-xs opacity-70 mb-1">Équivalent immobilier</p>
+                        <p className="text-lg font-bold">
+                          Comme si vous possédiez {((parseFloat(fungibleBalance) / fungibleTokenInfo.maxSupply) * 100).toFixed(2)}% de l'immeuble
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informations complémentaires */}
+                  <div className="grid grid-cols-2 gap-4 mt-6">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                      <p className="text-xs opacity-70 mb-1">Date de Tokenisation</p>
+                      <p className="text-sm font-semibold">
+                        {fungibleTokenInfo.tokenizationDate > 0 
+                          ? new Date(fungibleTokenInfo.tokenizationDate * 1000).toLocaleDateString('fr-FR', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })
+                          : 'N/A'}
+                      </p>
+                    </div>
+                    {fungibleTokenInfo.documentURI && fungibleTokenInfo.documentURI !== 'ipfs://QmExampleDocumentHash' && (
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                        <p className="text-xs opacity-70 mb-1">Documents</p>
+                        <a 
+                          href={fungibleTokenInfo.documentURI.startsWith('ipfs://') 
+                            ? `https://ipfs.io/ipfs/${fungibleTokenInfo.documentURI.replace('ipfs://', '')}` 
+                            : fungibleTokenInfo.documentURI}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-semibold hover:underline flex items-center gap-1"
+                        >
+                          📄 Voir les documents →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Liquidity Position */}
+            {liquidityPosition && parseFloat(liquidityPosition.lpTokens) > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span>💧</span> Ma Position de Liquidité
+                </h2>
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-md p-6 text-white">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="bg-white/20 rounded-lg p-4">
+                      <p className="text-sm opacity-90">LP Tokens</p>
+                      <p className="text-2xl font-bold">
+                        {parseFloat(liquidityPosition.lpTokens).toFixed(4)}
+                      </p>
+                    </div>
+                    <div className="bg-white/20 rounded-lg p-4">
+                      <p className="text-sm opacity-90">Part du Pool</p>
+                      <p className="text-2xl font-bold">
+                        {liquidityPosition.sharePercent.toFixed(2)}%
+                      </p>
+                    </div>
+                    <div className="bg-white/20 rounded-lg p-4">
+                      <p className="text-sm opacity-90">Tokens Disponibles</p>
+                      <p className="text-2xl font-bold">
+                        {parseFloat(liquidityPosition.tokenValue).toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="bg-white/20 rounded-lg p-4">
+                      <p className="text-sm opacity-90">ETH Disponibles</p>
+                      <p className="text-2xl font-bold">
+                        {parseFloat(liquidityPosition.ethValue).toFixed(4)} ETH
+                      </p>
+                    </div>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-sm opacity-90">Valeur Totale</p>
+                      <p className="text-3xl font-bold">
+                        {parseFloat(liquidityPosition.totalValueETH).toFixed(4)} ETH
+                      </p>
+                      <p className="text-sm opacity-75 mt-1">
+                        ≈ {(parseFloat(liquidityPosition.totalValueETH) * ethPriceEUR).toLocaleString('fr-FR')} €
+                      </p>
+                    </div>
+                    <a 
+                      href="/dex"
+                      className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                    >
+                      Gérer la Liquidité →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Tokens Fongibles */}
             <div className="mb-8">

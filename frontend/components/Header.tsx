@@ -37,9 +37,9 @@ export function Header() {
               <FileText className="w-4 h-4" />
               <span>KYC</span>
             </Link>
-            <Link href="/create/token" className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
+            <Link href="/mint/tokens" className="flex items-center space-x-1 text-gray-700 hover:text-green-600 transition">
               <Coins className="w-4 h-4" />
-              <span>Create Token</span>
+              <span>Mint Tokens</span>
             </Link>
             <Link href="/create/nft" className="flex items-center space-x-1 text-gray-700 hover:text-purple-600 transition">
               <Zap className="w-4 h-4" />

@@ -7,7 +7,7 @@ import { Header } from '@/components/Header';
 import SimpleDEXABI from '@/lib/abis/SimpleDEX.json';
 import FungibleTokenABI from '@/lib/abis/FungibleAssetToken.json';
 
-const DEX_ADDRESS = '0x28B2c6b3C1C9F09ca86e6B7cc8d0b9f0Bd7CE7F4' as `0x${string}`;
+const DEX_ADDRESS = '0x2Cf848B370C0Ce0255C4743d70648b096D3fAa98' as `0x${string}`;
 const TOKEN_ADDRESS = '0xfA451d9C32d15a637Ab376732303c36C34C9979f' as `0x${string}`;
 
 export default function DEXPage() {
@@ -33,6 +33,13 @@ export default function DEXPage() {
   // Liquidité
   const [ethToAddLiquidity, setEthToAddLiquidity] = useState('');
   const [tokensToAddLiquidity, setTokensToAddLiquidity] = useState('');
+  
+  // Position LP de l'utilisateur
+  const [userLPTokens, setUserLPTokens] = useState<string>('0');
+  const [totalLPSupply, setTotalLPSupply] = useState<string>('0');
+  const [userSharePercent, setUserSharePercent] = useState<number>(0);
+  const [userTokenValue, setUserTokenValue] = useState<string>('0');
+  const [userETHValue, setUserETHValue] = useState<string>('0');
   
   // État UI
   const [activeTab, setActiveTab] = useState<'swap' | 'liquidity'>('swap');
@@ -95,12 +102,60 @@ export default function DEXPage() {
     }
   };
 
+  // Charger la position LP de l'utilisateur
+  const loadUserLPPosition = async () => {
+    if (!publicClient || !address) return;
+
+    try {
+      const [lpBalance, poolInfo] = await Promise.all([
+        publicClient.readContract({
+          address: DEX_ADDRESS,
+          abi: SimpleDEXABI,
+          functionName: 'liquidity',
+          args: [address],
+        }) as Promise<bigint>,
+        publicClient.readContract({
+          address: DEX_ADDRESS,
+          abi: SimpleDEXABI,
+          functionName: 'getPoolInfo',
+        }) as Promise<[bigint, bigint, bigint]>,
+      ]);
+
+      const lpTokens = formatEther(lpBalance);
+      const [tokenReserve, ethReserve, totalLiquidity] = poolInfo;
+      const totalLP = formatEther(totalLiquidity);
+
+      setUserLPTokens(lpTokens);
+      setTotalLPSupply(totalLP);
+
+      if (parseFloat(totalLP) > 0) {
+        const share = (parseFloat(lpTokens) / parseFloat(totalLP)) * 100;
+        setUserSharePercent(share);
+
+        // Calculer la valeur en tokens et ETH que l'utilisateur peut retirer
+        const tokenVal = (parseFloat(formatEther(tokenReserve)) * share) / 100;
+        const ethVal = (parseFloat(formatEther(ethReserve)) * share) / 100;
+        
+        setUserTokenValue(tokenVal.toFixed(6));
+        setUserETHValue(ethVal.toFixed(6));
+      } else {
+        setUserSharePercent(0);
+        setUserTokenValue('0');
+        setUserETHValue('0');
+      }
+    } catch (error) {
+      console.error('Error loading LP position:', error);
+    }
+  };
+
   useEffect(() => {
     loadPoolData();
     loadUserBalances();
+    loadUserLPPosition();
     const interval = setInterval(() => {
       loadPoolData();
       loadUserBalances();
+      loadUserLPPosition();
     }, 10000);
     return () => clearInterval(interval);
   }, [publicClient, address]);
@@ -167,14 +222,21 @@ export default function DEXPage() {
       });
 
       console.log('Transaction hash:', hash);
-      alert(`Swap initiated! Hash: ${hash}`);
+      console.log('⏳ Waiting for transaction confirmation...');
+      
+      // Attendre la confirmation de la transaction
+      await publicClient?.waitForTransactionReceipt({ hash });
+      
+      console.log('✅ Transaction confirmed!');
+      alert(`✅ Swap réussi!\n\nVous avez échangé ${ethToSwap} ETH contre ~${parseFloat(estimatedTokens).toFixed(4)} tokens.\n\nTransaction: ${hash}`);
       
       setEthToSwap('');
-      await loadPoolData();
-      await loadUserBalances();
+      
+      // Recharger les données immédiatement
+      await Promise.all([loadPoolData(), loadUserBalances()]);
     } catch (error: any) {
       console.error('Swap error:', error);
-      alert(`Error: ${error.message || 'Transaction failed'}`);
+      alert(`❌ Erreur: ${error.message || 'Transaction failed'}`);
     } finally {
       setLoading(false);
     }
@@ -194,16 +256,44 @@ export default function DEXPage() {
 
     setLoading(true);
     try {
-      // 1. Approuver les tokens
-      const approveTx = await walletClient.writeContract({
+      console.log('📝 Checking current allowance...');
+      
+      // Vérifier l'allowance actuelle
+      const currentAllowance = await publicClient?.readContract({
         address: TOKEN_ADDRESS,
         abi: FungibleTokenABI,
-        functionName: 'approve',
-        args: [DEX_ADDRESS, parseEther(tokensToSwap)],
-      });
+        functionName: 'allowance',
+        args: [address, DEX_ADDRESS],
+      }) as bigint;
 
-      console.log('Approval hash:', approveTx);
-      await publicClient?.waitForTransactionReceipt({ hash: approveTx });
+      const amountToSwap = parseEther(tokensToSwap);
+      
+      console.log('Current allowance:', formatEther(currentAllowance));
+      console.log('Amount to swap:', tokensToSwap);
+
+      // N'approuver que si l'allowance actuelle est insuffisante
+      if (currentAllowance < amountToSwap) {
+        console.log('📝 Step 1/2: Approving tokens...');
+        
+        // Approuver un montant illimité pour éviter d'avoir à réapprouver à chaque fois
+        const maxUint256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+        
+        const approveTx = await walletClient.writeContract({
+          address: TOKEN_ADDRESS,
+          abi: FungibleTokenABI,
+          functionName: 'approve',
+          args: [DEX_ADDRESS, maxUint256],
+        });
+
+        console.log('Approval hash:', approveTx);
+        await publicClient?.waitForTransactionReceipt({ hash: approveTx });
+        
+        console.log('✅ Tokens approved (unlimited)!');
+      } else {
+        console.log('✅ Already approved, skipping approval step');
+      }
+      
+      console.log('🔄 Step 2/2: Swapping tokens for ETH...');
 
       // 2. Swap
       const minETH = (parseFloat(estimatedETH) * 0.98).toString();
@@ -211,18 +301,25 @@ export default function DEXPage() {
         address: DEX_ADDRESS,
         abi: SimpleDEXABI,
         functionName: 'swapTokensForETH',
-        args: [parseEther(tokensToSwap), parseEther(minETH)],
+        args: [amountToSwap, parseEther(minETH)],
       });
 
       console.log('Swap hash:', hash);
-      alert(`Swap initiated! Hash: ${hash}`);
+      console.log('⏳ Waiting for transaction confirmation...');
+      
+      // Attendre la confirmation
+      await publicClient?.waitForTransactionReceipt({ hash });
+      
+      console.log('✅ Transaction confirmed!');
+      alert(`✅ Swap réussi!\n\nVous avez échangé ${tokensToSwap} tokens contre ~${parseFloat(estimatedETH).toFixed(4)} ETH.\n\nTransaction: ${hash}`);
       
       setTokensToSwap('');
-      await loadPoolData();
-      await loadUserBalances();
+      
+      // Recharger les données immédiatement
+      await Promise.all([loadPoolData(), loadUserBalances()]);
     } catch (error: any) {
       console.error('Swap error:', error);
-      alert(`Error: ${error.message || 'Transaction failed'}`);
+      alert(`❌ Erreur: ${error.message || 'Transaction failed'}`);
     } finally {
       setLoading(false);
     }
@@ -263,15 +360,95 @@ export default function DEXPage() {
       });
 
       console.log('Add liquidity hash:', hash);
-      alert(`Liquidity added! Hash: ${hash}`);
+      await publicClient?.waitForTransactionReceipt({ hash });
+      
+      alert(`✅ Liquidité ajoutée!\n\nTransaction: ${hash}`);
       
       setEthToAddLiquidity('');
       setTokensToAddLiquidity('');
-      await loadPoolData();
-      await loadUserBalances();
+      await Promise.all([loadPoolData(), loadUserBalances(), loadUserLPPosition()]);
     } catch (error: any) {
       console.error('Add liquidity error:', error);
-      alert(`Error: ${error.message || 'Transaction failed'}`);
+      alert(`❌ Erreur: ${error.message || 'Transaction failed'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Retirer de la liquidité
+  const handleRemoveLiquidity = async () => {
+    if (!walletClient || !address) {
+      alert('Veuillez connecter votre wallet');
+      return;
+    }
+
+    if (parseFloat(userLPTokens) <= 0) {
+      alert('Vous n\'avez pas de liquidité à retirer');
+      return;
+    }
+
+    const percentToRemove = prompt(
+      `Vous avez ${parseFloat(userLPTokens).toFixed(4)} LP tokens.\n\n` +
+      `Cela représente:\n` +
+      `• ${parseFloat(userTokenValue).toFixed(2)} tokens\n` +
+      `• ${parseFloat(userETHValue).toFixed(4)} ETH\n\n` +
+      `Quel pourcentage voulez-vous retirer? (1-100)`
+    );
+
+    if (!percentToRemove || isNaN(parseFloat(percentToRemove))) {
+      return;
+    }
+
+    const percent = parseFloat(percentToRemove);
+    if (percent <= 0 || percent > 100) {
+      alert('Le pourcentage doit être entre 1 et 100');
+      return;
+    }
+
+    const lpToRemove = (parseFloat(userLPTokens) * percent) / 100;
+    const tokensToReceive = (parseFloat(userTokenValue) * percent) / 100;
+    const ethToReceive = (parseFloat(userETHValue) * percent) / 100;
+
+    const confirm = window.confirm(
+      `Confirmer le retrait de ${percent}% de votre liquidité?\n\n` +
+      `Vous allez retirer:\n` +
+      `• ${lpToRemove.toFixed(4)} LP tokens\n\n` +
+      `Vous recevrez environ:\n` +
+      `• ${tokensToReceive.toFixed(2)} tokens\n` +
+      `• ${ethToReceive.toFixed(4)} ETH`
+    );
+
+    if (!confirm) return;
+
+    setLoading(true);
+    try {
+      const lpAmount = parseEther(lpToRemove.toString());
+
+      const hash = await walletClient.writeContract({
+        address: DEX_ADDRESS,
+        abi: SimpleDEXABI,
+        functionName: 'removeLiquidity',
+        args: [lpAmount],
+      });
+
+      console.log('Remove liquidity hash:', hash);
+      console.log('⏳ Attente de la confirmation...');
+      
+      await publicClient?.waitForTransactionReceipt({ hash });
+      
+      console.log('✅ Transaction confirmée!');
+      alert(
+        `✅ Liquidité retirée avec succès!\n\n` +
+        `Vous avez récupéré:\n` +
+        `• ~${tokensToReceive.toFixed(2)} tokens\n` +
+        `• ~${ethToReceive.toFixed(4)} ETH\n\n` +
+        `Transaction: ${hash}`
+      );
+      
+      await Promise.all([loadPoolData(), loadUserBalances(), loadUserLPPosition()]);
+    } catch (error: any) {
+      console.error('Remove liquidity error:', error);
+      alert(`❌ Erreur: ${error.message || 'Transaction failed'}`);
     } finally {
       setLoading(false);
     }
@@ -334,6 +511,66 @@ export default function DEXPage() {
                     {parseFloat(tokenBalance).toFixed(2)}
                   </span>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Position LP de l'utilisateur */}
+          {isConnected && parseFloat(userLPTokens) > 0 && (
+            <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl p-6 mb-8 text-white shadow-lg">
+              <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+                💧 Votre Position de Liquidité
+              </h3>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-xs opacity-80 mb-1">LP Tokens</div>
+                  <div className="text-lg font-bold">{parseFloat(userLPTokens).toFixed(4)}</div>
+                </div>
+                
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-xs opacity-80 mb-1">Part du Pool</div>
+                  <div className="text-lg font-bold">{userSharePercent.toFixed(2)}%</div>
+                </div>
+                
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-xs opacity-80 mb-1">Tokens Déposés</div>
+                  <div className="text-lg font-bold">{parseFloat(userTokenValue).toFixed(2)}</div>
+                </div>
+                
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-xs opacity-80 mb-1">ETH Déposés</div>
+                  <div className="text-lg font-bold">{parseFloat(userETHValue).toFixed(4)}</div>
+                </div>
+              </div>
+
+              <div className="bg-white/10 rounded-lg p-4 flex items-center justify-between">
+                <div>
+                  <div className="text-sm opacity-80">Revenus Estimés</div>
+                  <div className="text-xs opacity-70 mt-1">
+                    Vous gagnez {userSharePercent.toFixed(2)}% des frais de swap (0.3% par transaction)
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm opacity-80">Valeur Totale</div>
+                  <div className="text-2xl font-bold">
+                    {(parseFloat(userTokenValue) + parseFloat(userETHValue) * parseFloat(reserveToken) / parseFloat(reserveETH)).toFixed(2)} TOKENS
+                  </div>
+                </div>
+              </div>
+
+              {/* Bouton pour retirer la liquidité */}
+              <div className="mt-4">
+                <button
+                  onClick={handleRemoveLiquidity}
+                  disabled={loading}
+                  className="w-full py-3 px-6 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? 'Traitement...' : '💰 Retirer ma liquidité'}
+                </button>
+                <p className="text-xs opacity-70 text-center mt-2">
+                  Récupérez vos tokens et ETH en échange de vos LP tokens
+                </p>
               </div>
             </div>
           )}
