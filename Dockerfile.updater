@@ -1,0 +1,27 @@
+# Dockerfile pour les scripts auto-update de prix
+FROM node:20-alpine
+
+# Installer les outils nécessaires
+RUN apk add --no-cache git
+
+# Créer le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de configuration
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY hardhat.config.ts ./
+
+# Copier les fichiers nécessaires
+COPY contracts/ ./contracts/
+COPY scripts/ ./scripts/
+COPY deployments/ ./deployments/
+
+# Installer toutes les dépendances (y compris dev pour hardhat)
+RUN npm install
+
+# Variables d'environnement
+ENV NODE_ENV=production
+
+# Le CMD sera spécifié dans Railway
+# Railway Settings > Start Command
